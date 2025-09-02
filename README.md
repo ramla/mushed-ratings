@@ -1,4 +1,4 @@
-# Mushroom edibility tracker
+# MushEd, a Mushroom Edibility Ratings App
 
 * Create your sampler account and log in
 * Report a sampled mushroom's identifiers, modify a report or delete it
