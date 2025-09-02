@@ -1,0 +1,1 @@
+Good day! You have been chosen to sample mushrooms on a newly found exoplanet. Create your account now and report your findings to claim credits. 1 000 000 credits earns you a trip back home and a gratis liver sample analysis. Remember to check back on what others have tasted!
