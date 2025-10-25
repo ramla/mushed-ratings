@@ -1,6 +1,7 @@
 venv
 __pycache__
-*.db
+database.db
 test*
 muist
 *.swp
+temp
