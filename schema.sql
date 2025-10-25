@@ -1,0 +1,77 @@
+CREATE TABLE mushrooms (
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE,
+  culinaryvalue INTEGER,
+  healthvalue INTEGER,
+  color INTEGER,
+  genus INTEGER,
+  FOREIGN KEY(culinaryvalue) REFERENCES culinaryvalues(id),
+  FOREIGN KEY(healthvalue) REFERENCES healthvalues(id),
+  FOREIGN KEY(color) REFERENCES colors(id),
+  FOREIGN KEY(genus) REFERENCES genera(id)
+);
+
+CREATE TABLE users (
+  id INTEGER PRIMARY KEY,
+  name TEXT UNIQUE,
+  auth TEXT,
+  lastlogon DATE
+);
+
+CREATE TABLE reports (
+  id INTEGER PRIMARY KEY,
+  uid INTEGER,
+  date DATE,
+  color INTEGER,
+  genus INTEGER,
+  blanched BOOLEAN,
+  FOREIGN KEY(uid) REFERENCES users(id),
+  FOREIGN KEY(color) REFERENCES colors(id),
+  FOREIGN KEY(genus) REFERENCES genera(id)
+);
+
+CREATE TABLE colors (
+  id INTEGER PRIMARY KEY,
+  hex TEXT,
+  name TEXT
+);
+
+CREATE TABLE genera (
+  id INTEGER PRIMARY KEY,
+  name TEXT
+);
+
+CREATE TABLE culinaryvalues (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  description TEXT
+);
+
+CREATE TABLE healthvalues (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  description TEXT
+);
+
+CREATE TABLE tastes (
+  id INTEGER PRIMARY KEY,
+  name TEXT,
+  description TEXT
+);
+
+CREATE TABLE report_tastes (
+  report_id INTEGER,
+  tastes_id INTEGER,
+  FOREIGN KEY(report_id) REFERENCES reports(id),
+  FOREIGN KEY(tastes_id) REFERENCES tastes(id)
+);
+
+CREATE TABLE comments (
+  id INTEGER PRIMARY KEY,
+  rid INTEGER,
+  uid INTEGER,
+  date DATE,
+  message TEXT,
+  FOREIGN KEY(rid) REFERENCES reports(id),
+  FOREIGN KEY(uid) REFERENCES users(id)
+);
