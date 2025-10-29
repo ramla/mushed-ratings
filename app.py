@@ -22,6 +22,10 @@ def page(page_id):
 def register():
     return render_template("register.html")
 
+@app.route("/report")
+def report():
+    return render_template("report.html")
+
 @app.route("/create", methods=["POST"])
 def create():
     username = request.form["username"]
@@ -45,13 +49,13 @@ def create():
 def login():
     username = request.form["username"]
     password = request.form["password"]
-    
+    redir    = request.form["redirect"]    
     sql = "SELECT auth FROM users WHERE name = ?"
     password_hash = db.query(sql, [username])[0][0]
 
     if check_password_hash(password_hash, password):
         session["username"] = username
-        return redirect("/")
+        return redirect(redir)
     else:
         return "Wrong username or password"
 
