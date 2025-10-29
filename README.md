@@ -11,23 +11,30 @@
 
 Primary data entity is the sampling report and the secondary data entity are the symptom reports
 
-## Sovelluksen asennus
+## How to install
 
-Asenna `flask`-kirjasto:
+Install `flask`-library:
 
 ```
 $ pip install flask
 ```
 
-Luo tietokannan taulut ja lisää alkutiedot:
+Initialise database:
 
 ```
 $ sqlite3 database.db < schema.sql
 $ sqlite3 database.db < init.sql
 ```
 
-Voit käynnistää sovelluksen näin:
+Create secret key:
+```
+python3 make_secret.py
+```
+
+Start server:
 
 ```
 $ flask run
 ```
+
+You should now be able to view app at https://localhost:5000/
