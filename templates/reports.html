@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Display</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Table Contents</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>UID</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Color</th>
+                <th>Culinary Value</th>
+                <th>Blanched</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for id,uid,date,category,color,culinaryvalue,blanched in data %}
+            <tr>
+                <td>{{ id }}</td>  <!-- ID -->
+                <td>{{ uid }}</td>  <!-- UID  -->
+                <td>{{ date }}</td>  <!-- Date -->
+                <td>{{ category }}</td>  <!-- Category -->
+                <td>{{ color }}</td>  <!-- Color -->
+                <td>{{ culinaryvalue }}</td>  <!-- Culinary Value -->
+                <td>{{ blanched }}</td>  <!-- Blanched (Boolean) -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -47,6 +47,12 @@ def send_report():
     db.execute(sql, params)
     return f"Report received <br> {params}"
 
+@app.route("/all_reports")
+def all_reports():
+    sql = "SELECT * FROM reports"
+    reports = db.query(sql)
+    return render_template("reports.html", data=reports)
+
 @app.route("/create", methods=["POST"])
 def create():
     username  = request.form["username"]
