@@ -1,14 +1,19 @@
+CREATE TABLE visits (
+  id INTEGER PRIMARY KEY,
+  visited_at TEXT
+);
+
 CREATE TABLE mushrooms (
   id INTEGER PRIMARY KEY,
   name TEXT UNIQUE,
   culinaryvalue INTEGER,
   healthvalue INTEGER,
   color INTEGER,
-  genus INTEGER,
+  category INTEGER,
   FOREIGN KEY(culinaryvalue) REFERENCES culinaryvalues(id),
   FOREIGN KEY(healthvalue) REFERENCES healthvalues(id),
   FOREIGN KEY(color) REFERENCES colors(id),
-  FOREIGN KEY(genus) REFERENCES genera(id)
+  FOREIGN KEY(category) REFERENCES categories(id)
 );
 
 CREATE TABLE users (
@@ -23,11 +28,11 @@ CREATE TABLE reports (
   uid INTEGER,
   date DATE,
   color INTEGER,
-  genus INTEGER,
+  category INTEGER,
   blanched BOOLEAN,
   FOREIGN KEY(uid) REFERENCES users(id),
   FOREIGN KEY(color) REFERENCES colors(id),
-  FOREIGN KEY(genus) REFERENCES genera(id)
+  FOREIGN KEY(category) REFERENCES categories(id)
 );
 
 CREATE TABLE colors (
@@ -36,7 +41,7 @@ CREATE TABLE colors (
   name TEXT
 );
 
-CREATE TABLE genera (
+CREATE TABLE categories (
   id INTEGER PRIMARY KEY,
   name TEXT
 );
