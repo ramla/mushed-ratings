@@ -28,12 +28,14 @@ CREATE TABLE reports (
   id INTEGER PRIMARY KEY,
   uid INTEGER,
   date DATE,
-  color INTEGER,
   category INTEGER,
+  color INTEGER,
+  culinaryvalue INTEGER,
   blanched BOOLEAN,
   FOREIGN KEY(uid) REFERENCES users(id),
   FOREIGN KEY(color) REFERENCES colors(id),
   FOREIGN KEY(category) REFERENCES categories(id)
+  FOREIGN KEY(culinaryvalue) REFERENCES culinaryvalues(id)
 );
 
 CREATE TABLE colors (
