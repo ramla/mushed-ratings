@@ -20,7 +20,8 @@ CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   name TEXT UNIQUE,
   auth TEXT,
-  lastlogon DATE
+  lastlogon DATE,
+  credits INTEGER DEFAULT 0
 );
 
 CREATE TABLE reports (
