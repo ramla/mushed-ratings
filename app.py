@@ -22,9 +22,11 @@ def page(page_id):
 def register():
     return render_template("register.html")
 
+#potential DoS surface for unregistered users?
 @app.route("/report")
 def report():
-    return render_template("report.html")
+    colors = db.query("SELECT id, name, hex FROM colors")
+    return render_template("report.html", colors=colors)
 
 @app.route("/create", methods=["POST"])
 def create():

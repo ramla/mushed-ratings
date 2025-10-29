@@ -4,9 +4,45 @@
 {%if session.username %}
 <head>
   <title>Report</title>
+    <style>
+        .color-grid {
+            display: flex;
+            flex-wrap: wrap;
+            width: 400px;
+        }
+        .color-option {
+            width: 20px;
+            height: 20px;
+            margin: 0px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+        input[type="radio"]:checked + label {
+            border: 2px solid black;
+        }
+        input[type="radio"]:not(:checked) + label {
+            border: 2px solid transparent;
+        }
+    </style>
 </head>
 <body>
-    <p>reportform</p>
+    <h1>reportform</h1>
+    <form action="/report" method="post">
+        <label for="color">Colour of the mushroom:</label>
+        <div class="color-grid">
+            {% for id,color,hex in colors %}
+            <input type="radio" id="{{ id }}" name="color" value="{{ hex }}">
+            <label for="{{ id }}" class="color-option" style="background-color: {{ hex }};"></label>
+            {% endfor %}
+        </div>
+        </select>
+        <br><br>
+        <input type="submit" value="Submit">
+    </form>
 
 {%else %}
 <head>
