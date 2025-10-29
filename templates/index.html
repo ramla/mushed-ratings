@@ -8,12 +8,28 @@
 <body>
   <h1>MushEd Ratings</h1>
   <p>Good day! You have been chosen to sample mushrooms on a newly found exoplanet. Create your account now and report your findings to claim credits. 1 000 000 credits earns you a trip back home and a gratis liver sample analysis. Remember to check back on what others have tasted!</p>
+  {% if session.username %}
+  <p>
+    Olet kirjautunut nimellä {{ session.username }}
+  </p>
+  <p>
+    <a href="/logout">Kirjaudu ulos</a>
+  </p>
+  {% else %}
+  <form action="/login" method="post">
+    <p>
+      Tunnus: <br />
+      <input type="text" name="username" />
+    </p>
+    <p>
+      Salasana: <br />
+      <input type="password" name="password" />
+    </p>
+    <input type="submit" value="Kirjaudu" />
+  </form>
+  {% endif %}
   <p>Register <a href="register">here</a>!</p>
-  <p>{{ second_p }}</p>
-  <!-- <ul>
-    {% for item in items %}
-    <li>{{ item }}</li>
-    {% endfor %} -->
-</body>
+  <p>{{ visits }}</p>
+  </body>
 
 </html>
