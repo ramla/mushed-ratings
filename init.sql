@@ -20,6 +20,22 @@ INSERT INTO healthvalues (name, description) VALUES ('Deadly', 'Potentially fata
 INSERT INTO healthvalues (name, description) VALUES ('Edible', 'Can be part of a healthy diet');
 INSERT INTO healthvalues (name, description) VALUES ('Unknown', 'No effects to health reported yet');
 
+INSERT INTO categories (name) VALUES ('Russula');
+INSERT INTO categories (name) VALUES ('Milk cap');
+INSERT INTO categories (name) VALUES ('Bolete');
+INSERT INTO categories (name) VALUES ('Chanterelle');
+INSERT INTO categories (name) VALUES ('Polypore');
+INSERT INTO categories (name) VALUES ('Cortinar');
+INSERT INTO categories (name) VALUES ('Tricholoma');
+INSERT INTO categories (name) VALUES ('Waxcap');
+INSERT INTO categories (name) VALUES ('Clitocybe');
+INSERT INTO categories (name) VALUES ('Tooth fungi');
+INSERT INTO categories (name) VALUES ('Puffball');
+INSERT INTO categories (name) VALUES ('Bonnet mushroom');
+INSERT INTO categories (name) VALUES ('Morel');
+INSERT INTO categories (name) VALUES ('Slime mold');
+INSERT INTO categories (name) VALUES ('Ink cap');
+
 INSERT INTO tastes (name, description) VALUES ('Mild', 'gentle, not strong or distinctive');
 INSERT INTO tastes (name, description) VALUES ('Sweet', 'sugary or pleasant');
 INSERT INTO tastes (name, description) VALUES ('Nutty', 'similar to nuts');
