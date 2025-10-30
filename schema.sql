@@ -31,12 +31,24 @@ CREATE TABLE reports (
   category INTEGER,
   color INTEGER,
   culinaryvalue INTEGER,
-  blanched BOOLEAN,
+  blanched INTEGER DEFAULT 0,
+  deleted INTEGER DEFAULT 0,
   FOREIGN KEY(uid) REFERENCES users(id),
   FOREIGN KEY(color) REFERENCES colors(id),
   FOREIGN KEY(category) REFERENCES categories(id)
   FOREIGN KEY(culinaryvalue) REFERENCES culinaryvalues(id)
 );
+
+CREATE TABLE symptomreport (
+  id INTEGER PRIMARY KEY,
+  uid INTEGER,
+  date DATE,
+  report_id INTEGER,
+  healthvalue INTEGER,
+  deleted INTEGER DEFAULT 0
+  FOREIGN KEY(report_id) REFERENCES reports(id),
+  FOREIGN KEY(healthvalue) REFERENCES healthvalues(id)
+)
 
 CREATE TABLE colors (
   id INTEGER PRIMARY KEY,
@@ -80,6 +92,7 @@ CREATE TABLE comments (
   uid INTEGER,
   date DATE,
   message TEXT,
+  deleted INTEGER DEFAULT 0,
   FOREIGN KEY(rid) REFERENCES reports(id),
   FOREIGN KEY(uid) REFERENCES users(id)
 );
