@@ -53,6 +53,35 @@ def all_reports():
     reports = db.query(sql)
     return render_template("reports.html", data=reports)
 
+@app.route("/search", methods=["GET"])
+def search():
+    keywords = request.args.get("query")
+    #TODO: validate input
+    #TODO: multiword search how
+    print(keywords)
+    sql = f"""  SELECT r.*, 
+                u.name AS user_name, 
+                c.name AS color_name, 
+                cat.name AS category_name, 
+                cv.name AS culinaryvalue_name
+                FROM reports r
+                    JOIN users u ON r.uid = u.id
+                    JOIN colors c ON r.color = c.id
+                    JOIN categories cat ON r.category = cat.id
+                    JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                WHERE u.name LIKE LOWER('%{keywords}%')
+                    OR c.name LIKE LOWER('%{keywords}%')
+                    OR cat.name LIKE LOWER('%{keywords}%')
+                    OR cv.name LIKE LOWER('%{keywords}%');"""
+    result = db.query(sql)
+    print(result)
+    for row in result:
+        print(row)
+        for item in row:
+            print(item,end=", ")
+        print("\n")
+    return render_template("search.html", data=result)
+
 @app.route("/create", methods=["POST"])
 def create():
     username  = request.form["username"]

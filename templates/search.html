@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table Display</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Table Contents</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Color</th>
+                <th>Culinary Value</th>
+                <th>Blanched</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data %}
+            <tr>
+                <td><a href="/view_report/{{ row.id }}">Report {{ row.id }}</a></td>  <!-- ID -->
+                <td><a href="/view_user/{{ row.uid }}">{{ row.user_name }}</a></td>  <!-- UID  -->
+                <td>{{ row.date }}</td>  <!-- Date -->
+                <td><a href="/search?query={{ row.category_name }}">{{ row.category_name }}</a></td>  <!-- Category -->
+                <td><a href="/search?query={{ row.color_name }}">{{ row.color_name }}</a></td>  <!-- Color -->
+                <td><a href="/search?query={{ row.culinaryvalue_name }}">{{ row.culinaryvalue_name }}</a></td>  <!-- Culinary Value -->
+                <td>{{ row.blanched }}</td>  <!-- Blanched (Boolean) -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
