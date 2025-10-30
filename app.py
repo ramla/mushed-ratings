@@ -23,21 +23,22 @@ def view_report(report_id):
     if not "username" in session:
         return redirect("/")
     
-    colors         = db.query("SELECT id, name, hex FROM colors")
-    tastes         = db.query("SELECT id, name, description FROM tastes")
-    culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
-    categories     = db.query("SELECT id, name FROM categories")
-    fetched        = db.query(f"""  SELECT r.*, 
-                                    u.name AS user_name, 
-                                    c.name AS color_name, 
-                                    cat.name AS category_name, 
-                                    cv.name AS culinaryvalue_name
-                                    FROM reports r
-                                        JOIN users u ON r.uid = u.id
-                                        JOIN colors c ON r.color = c.id
-                                        JOIN categories cat ON r.category = cat.id
-                                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                                    WHERE r.id = {report_id}""")
+    colors          = db.query("SELECT id, name, hex FROM colors")
+    tastes          = db.query("SELECT id, name, description FROM tastes")
+    culinaryvalues  = db.query("SELECT id, name, description FROM culinaryvalues")
+    categories      = db.query("SELECT id, name FROM categories")
+    sql = """   SELECT r.*, 
+                u.name AS user_name, 
+                c.name AS color_name, 
+                cat.name AS category_name, 
+                cv.name AS culinaryvalue_name
+                FROM reports r
+                    JOIN users u ON r.uid = u.id
+                    JOIN colors c ON r.color = c.id
+                    JOIN categories cat ON r.category = cat.id
+                    JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                WHERE r.id = ?"""
+    fetched         = db.query(sql, report_id)
     return render_template("view_report.html", report=fetched, colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
 
 #TODO: potential DoS surface for registered users
@@ -90,11 +91,11 @@ def search():
                     JOIN colors c ON r.color = c.id
                     JOIN categories cat ON r.category = cat.id
                     JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                WHERE u.name LIKE LOWER('%{keywords}%')
-                    OR c.name LIKE LOWER('%{keywords}%')
-                    OR cat.name LIKE LOWER('%{keywords}%')
-                    OR cv.name LIKE LOWER('%{keywords}%');"""
-    result = db.query(sql)
+                WHERE u.name LIKE LOWER('%?%')
+                    OR c.name LIKE LOWER('%?%')
+                    OR cat.name LIKE LOWER('%?%')
+                    OR cv.name LIKE LOWER('%?%');"""
+    result = db.query(sql, [keywords, keywords, keywords, keywords])
     print(result)
     for row in result:
         print(row)
