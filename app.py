@@ -14,17 +14,38 @@ def index():
     print(result)
     return render_template("index.html", visits=paragraph)
 
-@app.route("/page/<int:page_id>")
-def page(page_id):
-    return "Tämä on sivu " + str(page_id)
-
 @app.route("/register")
 def register():
     return render_template("register.html")
 
-#TODO: potential DoS surface for unregistered users?
+@app.route("/view_report/<int:report_id>")
+def view_report(report_id):
+    if not "username" in session:
+        return redirect("/")
+    
+    colors         = db.query("SELECT id, name, hex FROM colors")
+    tastes         = db.query("SELECT id, name, description FROM tastes")
+    culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
+    categories     = db.query("SELECT id, name FROM categories")
+    fetched        = db.query(f"""  SELECT r.*, 
+                                    u.name AS user_name, 
+                                    c.name AS color_name, 
+                                    cat.name AS category_name, 
+                                    cv.name AS culinaryvalue_name
+                                    FROM reports r
+                                        JOIN users u ON r.uid = u.id
+                                        JOIN colors c ON r.color = c.id
+                                        JOIN categories cat ON r.category = cat.id
+                                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                                    WHERE r.id = {report_id}""")
+    return render_template("view_report.html", report=fetched, colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
+
+#TODO: potential DoS surface for registered users
 @app.route("/report")
 def report():
+    if not "username" in session:
+        return redirect("/")
+
     colors         = db.query("SELECT id, name, hex FROM colors")
     tastes         = db.query("SELECT id, name, description FROM tastes")
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")

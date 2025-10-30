@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 
-{%if session.username %}
 <head>
   <title>Report</title>
     <style>
@@ -58,24 +57,6 @@
         <input type="submit" value="Submit">
     </form>
 
-{%else %}
-<head>
-  <title>Login</title>
-</head>
-<body>
-  <form action="/login" method="post">
-    <p>
-      Username: <br />
-      <input type="text" name="username" />
-    </p>
-    <p>
-      Password: <br />
-      <input type="password" name="password" />
-    </p>
-    <input type="hidden" name="redirect" value="/report" />
-    <input type="submit" value="Login" />
-  </form>
-  {% endif %}
 </body>
 
 </html>
