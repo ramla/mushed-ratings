@@ -22,7 +22,8 @@ def register():
 def view_report(report_id):
     if not "username" in session:
         return redirect("/")
-    
+
+    param = str(report_id)
     colors          = db.query("SELECT id, name, hex FROM colors")
     tastes          = db.query("SELECT id, name, description FROM tastes")
     culinaryvalues  = db.query("SELECT id, name, description FROM culinaryvalues")
@@ -38,8 +39,8 @@ def view_report(report_id):
                     JOIN categories cat ON r.category = cat.id
                     JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
                 WHERE r.id = ?"""
-    fetched         = db.query(sql, report_id)
-    return render_template("view_report.html", report=fetched, colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
+    fetched         = db.query(sql, param)
+    return render_template("view_report.html", fetched=fetched[0], colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
 
 #TODO: potential DoS surface for registered users
 @app.route("/report")
@@ -80,7 +81,7 @@ def search():
     keywords = request.args.get("query")
     #TODO: validate input
     #TODO: multiword search how
-    print(keywords)
+    keywords = "%" + keywords + "%"
     sql = f"""  SELECT r.*, 
                 u.name AS user_name, 
                 c.name AS color_name, 
@@ -91,10 +92,10 @@ def search():
                     JOIN colors c ON r.color = c.id
                     JOIN categories cat ON r.category = cat.id
                     JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                WHERE u.name LIKE LOWER('%?%')
-                    OR c.name LIKE LOWER('%?%')
-                    OR cat.name LIKE LOWER('%?%')
-                    OR cv.name LIKE LOWER('%?%');"""
+                WHERE u.name LIKE LOWER(?)
+                    OR c.name LIKE LOWER(?)
+                    OR cat.name LIKE LOWER(?)
+                    OR cv.name LIKE LOWER(?);"""
     result = db.query(sql, [keywords, keywords, keywords, keywords])
     print(result)
     for row in result:
