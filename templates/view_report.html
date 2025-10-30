@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Report</title>
+  <title>Sampling report {{ fetched.id }}</title>
     <style>
         .color-grid {
             display: flex;
@@ -26,37 +26,92 @@
         input[type="radio"]:not(:checked) + label {
             border: 2px solid transparent;
         }
+        table {
+            width: 50%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 <body>
 {% if session.username %}
+    <h2>Sampling report</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Attribute</th>
+                <th>Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Report ID</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Username</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Category</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Color</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Taste</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Culinary Value</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Edibility</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+            <tr>
+                <td>Edibility Blanched</td>
+                <td></td> <!-- Empty cell -->
+            </tr>
+        </tbody>
+    </table>
     <details>
-        <summary>edit report</summary>
+        <summary>Edit report {{ fetched.id }}</summary>
             <div class="toggle-content">
                 <form action="/send_report" method="post">
                     <label for="category"><h3>Mushroom category:</h3></label>
                     <p><select name="category" id="category">
                         {% for id,name in categories %}
-                        <option value="{{ id }}"{% if report.category = id%} selected{% else %}{% endif %}>{{ name }}</option>
+                        <option value="{{ id }}" {% if fetched.category == id%} selected {% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select></p>
-                    <!-- <label for="color"><h3>Colour of the mushroom:</h3></label>
+                    <label for="color"><h3>Colour of the mushroom:</h3></label>
                     <div class="color-grid">
                         {% for id,color,hex in colors %}
-                        <input type="radio" id="{{ id }}" name="color" value="{{ id }}">
+                        <input type="radio" id="{{ id }}" name="color" value="{{ id }}" {% if fetched.color == id %} checked {% endif %}>
                         <label for="{{ id }}" class="color-option" style="background-color: {{ hex }};"></label>
                         {% endfor %}
                     </div>
                     <h3>Culinary value:</h3>
                     <select name="culvalue">
-                        <option value="-1">Select one</option>
                         {% for id,name,description in culvalues %}
-                        <option value="{{ id }}">{{ name }}</option>
+                        <option value="{{ id }}" {% if fetched.culinaryvalue == id%} selected {% endif %}>{{ name }}</option>
                         {% endfor %}
                     </select>
-                    <p><input type="checkbox" id="blanched" name="blanched" value="True" />
+                    <p><input type="checkbox" id="blanched" name="blanched" value="True" {% if fetched.blanched %} checked {% endif %} />
                     <label for="blanched">Blanched before use</label></p>
-                    <input type="submit" value="Submit"> -->
+                    <input type="submit" value="Submit">
                 </form>
             </div>
     </details>
