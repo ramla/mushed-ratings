@@ -56,19 +56,32 @@ def report():
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
+    tastecount    = db.query("SELECT COUNT(*) FROM tastes")[0][0]
     category      = request.form["category"]
     color         = request.form["color"]
+    tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]
     culinaryvalue = request.form["culvalue"]
     blanched      = request.form.get("blanched")
-    if not blanched:
-        blanched = False
+    if blanched:
+        blanched = 1
+    else:
+        blanched = 0
+    
     #TODO: validate input
+
+    print("tastes",tastes)
 
     uid = get_uid(session["username"])
     sql = f"INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) VALUES (?, datetime('now'), ?, ?, ?, ?)"
     params = [uid, category, color, culinaryvalue, blanched]
     db.execute(sql, params)
-    return f"Report received <br> {params}"
+    report_id = db.last_insert_id()
+    print(report_id)
+    sql = "INSERT INTO report_tastes (report_id, tastes_id) VALUES (?, ?)"
+    for i in tastes:
+        print(f"tasteassoc report_id {report_id} taste {i}")
+        db.execute(sql, [report_id, i])
+    return f"Report received <br> {report_id}: {params}, {tastes}"
 
 @app.route("/all_reports")
 def all_reports():

@@ -26,6 +26,15 @@
         input[type="radio"]:not(:checked) + label {
             border: 2px solid transparent;
         }
+        .checkbox-container {
+            display: flex;
+            justify-content: left;
+            max-width: 400px;
+            flex-wrap: wrap;
+        }
+        .column {
+            width: 45%;
+        }
     </style>
 </head>
 <body>
@@ -45,6 +54,17 @@
             <label for="{{ id }}" class="color-option" style="background-color: {{ hex }};"></label>
             {% endfor %}
         </div>
+        <h2>Select Flavor Profiles</h2>
+        <div class="checkbox-container">
+            {% for col in tastes|batch(tastes|length // 2) %}
+            <div class="column">
+                {% for row in col %}
+                <label><input type="checkbox" name="taste{{ row.id }}" > {{ row.name }}</label><br>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
         <h3>Culinary value:</h3>
         <select name="culvalue">
             <option value="-1">Select one</option>
