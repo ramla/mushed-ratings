@@ -13,6 +13,13 @@
             width: 20px;
             height: 20px;
             margin: 0px;
+            cursor: pointer;
+            box-sizing: border-box;
+        }
+        .color-option-inner {
+            width: 100%;
+            height: 100%;
+            margin: 0px;
             border: 2px solid transparent;
             cursor: pointer;
             box-sizing: border-box;
@@ -37,13 +44,13 @@
        }
         .tooltip {
             position: relative;
-            display: inline-block;
+            display: flex;
             cursor: pointer;
         }
 
         .tooltip .tooltiptext {
             visibility: hidden;
-            width: 120px;
+            width: 0px;
             background-color: black;
             color: #fff;
             text-align: center;
@@ -60,6 +67,7 @@
 
         .tooltip:hover .tooltiptext {
             visibility: visible;
+            width: 120px;
             opacity: 1;
         }
     </style>
@@ -77,8 +85,11 @@
         <label for="color"><h3>Colour of the mushroom:</h3></label>
         <div class="color-grid">
             {% for id,color,hex in colors %}
-            <input type="radio" id="{{ id }}" name="color" value="{{ id }}">
-            <label for="{{ id }}" class="color-option" style="background-color: {{ hex }};"></label>
+            <div class="color-option tooltip">
+                <input type="radio" id="{{ id }}" name="color" value="{{ id }}">
+                <label for="{{ id }}" class="color-option-inner" style="background-color: {{ hex }};" title="aakdgjdagjsgdj"></label>
+                <!-- <span class="tooltiptext">{{ color }}</span> -->
+            </div>
             {% endfor %}
         </div>
         <h2>Select Flavor Profiles</h2>
