@@ -82,6 +82,7 @@ def send_report():
         print(f"tasteassoc report_id {report_id} taste {i}")
         db.execute(sql, [report_id, i])
     return f"Report received <br> {report_id}: {params}, {tastes}"
+    #TODO: redirect
 
 @app.route("/all_reports")
 def all_reports():
