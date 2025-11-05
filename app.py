@@ -23,7 +23,7 @@ def view_report(report_id):
     if not "username" in session:
         return redirect("/")
 
-    param = str(report_id)
+    param = (report_id,)
     colors          = db.query("SELECT id, name, hex FROM colors")
     tastes          = db.query("SELECT id, name, description FROM tastes")
     culinaryvalues  = db.query("SELECT id, name, description FROM culinaryvalues")
@@ -41,6 +41,26 @@ def view_report(report_id):
                 WHERE r.id = ?"""
     fetched         = db.query(sql, param)
     return render_template("view_report.html", fetched=fetched[0], colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
+
+@app.route("/view_user/<int:user_id>")
+def view_user(user_id):
+    if not "username" in session:
+        return redirect("/")
+
+    param = str(user_id)
+    sql_user_report_count = """ SELECT COUNT(*) FROM reports
+                                WHERE reports.uid = ?
+    """
+    sql_user_data = """              SELECT id, name, lastlogon, credits FROM users
+                                WHERE id = ?
+    """
+
+    user_report_count   = db.query(sql_user_report_count, param)[0][0]
+    user_data           = db.query(sql_user_data, param)[0]
+    _, user_name, lastlogon, credits = user_data
+    if not lastlogon:
+        lastlogon = "Never"
+    return f"user_report_count {user_report_count}<br>user {user_name}, lastlogon {lastlogon}, {credits} credits"
 
 #TODO: potential DoS surface for registered users
 @app.route("/report")

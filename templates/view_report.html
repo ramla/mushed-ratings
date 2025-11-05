@@ -1,47 +1,12 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-  <title>Sampling report {{ fetched.id }}</title>
-    <style>
-        .color-grid {
-            display: flex;
-            flex-wrap: wrap;
-            width: 400px;
-        }
-        .color-option {
-            width: 20px;
-            height: 20px;
-            margin: 0px;
-            border: 2px solid transparent;
-            cursor: pointer;
-            box-sizing: border-box;
-        }
-        input[type="radio"] {
-            display: none;
-        }
-        input[type="radio"]:checked + label {
-            border: 2px solid black;
-        }
-        input[type="radio"]:not(:checked) + label {
-            border: 2px solid transparent;
-        }
-        table {
-            width: 50%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
-</head>
-<body>
+{% block title %}View report - {% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+{% endblock %}
+
+{% block content %}
 {% if session.username %}
     <h2>Sampling report</h2>
     <table>
@@ -122,6 +87,4 @@
 
 {% else %}
 {% endif %}
-</body>
-
-</html>
+{% endblock %}

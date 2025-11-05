@@ -1,0 +1,40 @@
+:root {
+  --color-primary: #7590fd;
+  --color-secondary: #a9b9e9;
+  --color-accent: #eeee4a;
+  --color-background: #181818;
+  --color-altbackground: #282828;
+  --color-text: #eeeeee;
+}
+
+body {
+    background-color: #181818;
+    color: var(--color-text);
+}
+
+a:link {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+a:visited {
+  color: var(--color-secondary);
+}
+a:hover {
+  text-decoration: underline;
+}
+a:active {
+  color: var(--color-primary);
+}
+
+input {
+    background-color: var(--color-altbackground);
+    color: var(--color-text);
+    padding: 3px;
+    margin-top: 3px;
+    font-size: 90%;
+}
+
+.base-container {
+    max-width: 500px;
+    margin: auto;
+}

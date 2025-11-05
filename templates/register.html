@@ -1,26 +1,22 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-  <title>Rekisteröinti</title>
-</head>
+{% block title %}Sign up - {% endblock %}
 
-<body>
-  <form action="/create" method="post">
+{% block content %}
+<div class="base-container"><form action="/create" method="post">
+  <h1>Sign up for MushEd</h1>
     <p>
-      Tunnus: <br />
+      Username: <br />
       <input type="text" name="username" />
     </p>
     <p>
-      Salasana: <br />
+      Password: <br />
       <input type="password" name="password1" />
     </p>
     <p>
-      Salasana uudestaan: <br />
+      Re-enter password: <br />
       <input type="password" name="password2" />
     </p>
-    <input type="submit" value="Luo tunnus" />
-  </form>
-</body>
-
-</html>
+    <input type="submit" value="Create account" />
+  </form></div>
+{% endblock %}
