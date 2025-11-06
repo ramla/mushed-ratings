@@ -21,7 +21,7 @@
             border: 2px solid transparent;
         }
         table {
-            width: 50%;
+            width: 100%;
             border-collapse: collapse;
             margin: 20px 0;
         }
@@ -32,4 +32,8 @@
         }
         th {
             /* background-color: #020202; */
+        }
+        
+        .note {
+            font-size: 80%;
         }

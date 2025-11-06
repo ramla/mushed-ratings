@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}User: {{ user.name }} - {% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='view.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="base-container"><h2>User: {{ user.name }}</h2>
+    <table>
+        <thead>
+            <tr>
+                <td>Username</td>
+                <td>{{ user.name }}</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>User ID</td>
+                <td>{{ user.id }}</td>
+            </tr>
+            <tr>
+                <td>Last logon</td>
+                <td>{{ user.lastlogon }}</td>
+            </tr>
+            <tr>
+                <td>Credits accumulated</td>
+                <td>{{ user.credits }}</td>
+            </tr>
+            <tr>
+                <td>Reported samplings</td>
+                <td>{{ reports }} <span class="note"><a href="{{ url_for('search', query=search_query) }}">show reports</a></span></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
