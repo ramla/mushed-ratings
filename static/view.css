@@ -29,9 +29,7 @@
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
-        }
-        th {
-            /* background-color: #020202; */
+            vertical-align: top;
         }
         
         .note {

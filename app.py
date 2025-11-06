@@ -28,19 +28,26 @@ def view_report(report_id):
     tastes          = db.query("SELECT id, name, description FROM tastes")
     culinaryvalues  = db.query("SELECT id, name, description FROM culinaryvalues")
     categories      = db.query("SELECT id, name FROM categories")
-    sql = """   SELECT r.*, 
-                u.name AS user_name, 
-                c.name AS color_name, 
-                cat.name AS category_name, 
-                cv.name AS culinaryvalue_name
-                FROM reports r
-                    JOIN users u ON r.uid = u.id
-                    JOIN colors c ON r.color = c.id
-                    JOIN categories cat ON r.category = cat.id
-                    JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                WHERE r.id = ?"""
-    fetched         = db.query(sql, param)
-    return render_template("view_report.html", fetched=fetched[0], colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
+    taste_sql =  """SELECT t.name 
+                    FROM tastes t
+                        JOIN report_tastes rt ON t.id = rt.tastes_id
+                        JOIN reports r        ON r.id = rt.report_id
+                    WHERE r.id = ?"""
+    report_tastes   = db.query(taste_sql, param)
+    print(report_tastes)
+    report_sql = """SELECT r.*, 
+                    u.name AS user_name, 
+                    c.name AS color_name, 
+                    cat.name AS category_name, 
+                    cv.name AS culinaryvalue_name
+                    FROM reports r
+                        JOIN users u ON r.uid = u.id
+                        JOIN colors c ON r.color = c.id
+                        JOIN categories cat ON r.category = cat.id
+                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                    WHERE r.id = ?"""
+    fetched         = db.query(report_sql, param)
+    return render_template("view_report.html", fetched=fetched[0], colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories, report_tastes=report_tastes)
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):

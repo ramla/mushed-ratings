@@ -8,14 +8,9 @@
 
 {% block content %}
 {% if session.username %}
-    <h2>Sampling report</h2>
+<div class="base-container">
+<h2>Sampling report</h2>
     <table>
-        <thead>
-            <tr>
-                <th>Attribute</th>
-                <th>Value</th>
-            </tr>
-        </thead>
         <tbody>
             <tr>
                 <td>Report ID</td>
@@ -39,7 +34,7 @@
             </tr>
             <tr>
                 <td>Taste</td>
-                <td></td>
+                <td>{% for taste in report_tastes %}{{ taste.name }}<br>{% endfor %}</td>
             </tr>
             <tr>
                 <td>Culinary Value</td>
@@ -84,6 +79,7 @@
                 </form>
             </div>
     </details>
+</div>    
 
 {% else %}
 {% endif %}
