@@ -17,7 +17,7 @@ input[type="radio"]:not(:checked) + label {
 .color-grid {
     display: flex;
     flex-wrap: wrap;
-    width: 320px;
+    width: 360px;
 }
 .color-option {
     width: 20px;
