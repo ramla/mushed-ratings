@@ -1,44 +1,11 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-  <title>Report</title>
-    <style>
-        .color-grid {
-            display: flex;
-            flex-wrap: wrap;
-            width: 400px;
-        }
-        .color-option {
-            width: 20px;
-            height: 20px;
-            margin: 0px;
-            cursor: pointer;
-            box-sizing: border-box;
-            display: flex;
-        }
-        input[type="radio"] {
-            display: none;
-        }
-        input[type="radio"]:checked + label {
-            border: 2px solid black;
-        }
-        input[type="radio"]:not(:checked) + label {
-            border: 2px solid transparent;
-        }
-        .checkbox-container {
-            display: flex;
-            justify-content: left;
-            max-width: 400px;
-            flex-wrap: wrap;
-        }
-        .column {
-            width: 45%;
-       }
-    </style>
-</head>
-<body>
-    <h1>reportform</h1>
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='report.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="base-container"><h1>Report form</h1>
     <form action="/send_report" method="post">
         <label for="category"><h3>Mushroom category:</h3></label>
         <p><select name="category" id="category">
@@ -56,7 +23,7 @@
             </div>
             {% endfor %}
         </div>
-        <h2>Select Flavor Profiles</h2>
+        <h3>Select Flavor Profiles</h3>
         <div class="checkbox-container">
             {% for col in tastes|batch(tastes|length // 2) %}
                 <div class="column">
@@ -69,7 +36,6 @@
                 </div>
             {% endfor %}
         </div>
-
         <h3>Culinary value:</h3>
         <select name="culvalue">
             <option value="-1">Select one</option>
@@ -81,7 +47,5 @@
         <label for="blanched">Blanched before use</label></p>
         <input type="submit" value="Submit">
     </form>
-
-</body>
-
-</html>
+</div>
+{% endblock %}

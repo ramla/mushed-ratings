@@ -1,0 +1,32 @@
+input[type="radio"] {
+    display: none;
+}
+input[type="radio"]:checked + label {
+    border: 2px solid black;
+}
+input[type="radio"]:not(:checked) + label {
+    border: 2px solid transparent;
+}
+
+.checkbox-container {
+    display: flex;
+    justify-content: left;
+    max-width: 400px;
+    flex-wrap: wrap;
+}
+.color-grid {
+    display: flex;
+    flex-wrap: wrap;
+    width: 400px;
+}
+.color-option {
+    width: 20px;
+    height: 20px;
+    margin: 0px;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+}
+.column {
+    width: 45%;
+}
