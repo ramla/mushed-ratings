@@ -41,3 +41,28 @@ input {
 .note {
     font-size: 80%;
 }
+.navbar {
+    display: flex;
+    width: 60%;
+    overflow: hidden;
+    text-align: center;
+    justify-content: center;
+    margin: auto;
+}
+.navbar a {
+    background-color: var(--color-altbackground);
+    display: inline-block;
+    color: var(--color-text);
+    text-align: center;
+    padding: 8px 1%;
+}
+.navbar a:hover {
+    background-color: var(--color-background);
+    color: var(--color-primary);
+    text-decoration: none;
+}
+.navspacer {
+    min-width: 0;
+    max-width: 10%;
+    flex: 1;
+}

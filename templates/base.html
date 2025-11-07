@@ -2,12 +2,27 @@
 <html>
 
 <head>
-  <title>{% block title %}{% endblock %}MushEd Ratings</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}MushEd Ratings</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
     {% block stylesheets %}
     {% endblock %}
 </head>
 <body>
+    <div class="navbar">
+        <a href="{{ url_for('index') }}">MushEd</a>
+        <a href="{{ url_for('report') }}">Report form</a>
+
+        <div class="navspacer"></div>
+
+        <a href="">SearchFieldHere</a>
+        {% if session.username %}
+            <a href="/logout">Logout</a>
+        {% else %}
+            <a href="">Login</a>
+        {% endif %}
+    </div>
 {% block content %}
 {% endblock %}
 

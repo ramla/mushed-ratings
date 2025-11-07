@@ -17,7 +17,7 @@ input[type="radio"]:not(:checked) + label {
 .color-grid {
     display: flex;
     flex-wrap: wrap;
-    width: 400px;
+    width: 320px;
 }
 .color-option {
     width: 20px;
@@ -29,4 +29,8 @@ input[type="radio"]:not(:checked) + label {
 }
 .column {
     width: 45%;
+}
+.report-container {
+    width: fit-content;
+    margin: auto;
 }
