@@ -38,3 +38,6 @@ input {
     max-width: 500px;
     margin: auto;
 }
+.note {
+    font-size: 80%;
+}
