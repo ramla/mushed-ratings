@@ -62,7 +62,7 @@
                 <div class="column">
                     {% for row in col %}
                         <label title="{{ row.description }}">
-                            <input type="checkbox" name="taste{{ row.id }}" > {{ row.name }}
+                            <input type="checkbox" name="taste{{ row.id }}" {% if row.id == 1 %}checked{% endif %}> {{ row.name }}
                         </label>
                     <br>
                     {% endfor %}

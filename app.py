@@ -96,18 +96,20 @@ def send_report():
     
     #TODO: validate input
 
-    print("tastes",tastes)
-
     uid = get_uid(session["username"])
     sql = f"INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) VALUES (?, datetime('now'), ?, ?, ?, ?)"
     params = [uid, category, color, culinaryvalue, blanched]
     db.execute(sql, params)
     report_id = db.last_insert_id()
-    print(report_id)
+
     sql = "INSERT INTO report_tastes (report_id, tastes_id) VALUES (?, ?)"
+    tastes_inserted = 0
     for i in tastes:
-        print(f"tasteassoc report_id {report_id} taste {i}")
+        tastes_inserted += 1
         db.execute(sql, [report_id, i])
+    if tastes_inserted == 0:
+        db.execute(sql, [report_id, 1]) # mild
+
     return f"Report received <br> {report_id}: {params}, {tastes}"
     #TODO: redirect
 
