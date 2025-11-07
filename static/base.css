@@ -33,6 +33,10 @@ input {
     margin-top: 3px;
     font-size: 90%;
 }
+summary {
+    list-style: none;
+    cursor: pointer;
+}
 
 .base-container {
     max-width: 500px;
@@ -43,26 +47,50 @@ input {
 }
 .navbar {
     display: flex;
-    width: 60%;
-    overflow: hidden;
+    min-width: 60%;
+    overflow:auto;
     text-align: center;
     justify-content: center;
     margin: auto;
+    flex-wrap: wrap;
 }
-.navbar a {
+.navbutton {
     background-color: var(--color-altbackground);
     display: inline-block;
     color: var(--color-text);
     text-align: center;
     padding: 8px 1%;
+    margin-left: 1px;
+    margin-right: 1px;
 }
-.navbar a:hover {
+.navbutton:hover {
     background-color: var(--color-background);
     color: var(--color-primary);
     text-decoration: none;
+}
+.navbutton:visited {
+  color: var(--color-text);
 }
 .navspacer {
     min-width: 0;
     max-width: 10%;
     flex: 1;
+}
+.searchbutton {
+    background-color: var(--color-altbackground);
+}
+.searchbutton:hover {
+    background-color: var(--color-altbackground);
+}
+.toggle-content {
+    display: none;
+    z-index: 1;
+    height: 20px;
+    align-items: center;
+}
+details[open] .toggle-content {
+    display: inline-flex;
+}
+details[open] summary {
+    display: none;
 }

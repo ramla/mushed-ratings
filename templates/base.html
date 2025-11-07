@@ -11,16 +11,27 @@
 </head>
 <body>
     <div class="navbar">
-        <a href="{{ url_for('index') }}">MushEd</a>
-        <a href="{{ url_for('report') }}">Report form</a>
+         <a class="navbutton" href="{{ url_for('index') }}">MushEd</a>
+         <a class="navbutton" href="{{ url_for('report') }}">Report form</a>
 
         <div class="navspacer"></div>
 
-        <a href="">SearchFieldHere</a>
+        <div class="navbutton searchbutton">
+            <details>
+                <summary>Search</summary>
+                    <div class="toggle-content">
+                        <form class="search-form" action="/search" method="GET">
+                                <input type="text" name="query" placeholder="Search from reports" required>
+                                <input type="submit" value="Search">
+                        </form>
+                    </div>
+            </details>
+        </div>
+
         {% if session.username %}
-            <a href="/logout">Logout</a>
+             <a class="navbutton" href="/logout">Logout</a>
         {% else %}
-            <a href="">Login</a>
+             <a class="navbutton" href="">Login</a>
         {% endif %}
     </div>
 {% block content %}
