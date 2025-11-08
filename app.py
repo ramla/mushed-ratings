@@ -32,19 +32,7 @@ def view_report(report_id):
                         JOIN reports r        ON r.id = rt.report_id
                     WHERE r.id = ?"""
     report_tastes   = db.query(taste_sql, param)
-    print(report_tastes)
-    report_sql = """SELECT r.*,
-                    u.name AS user_name,
-                    c.name AS color_name,
-                    cat.name AS category_name,
-                    cv.name AS culinaryvalue_name
-                    FROM reports r
-                        JOIN users u ON r.uid = u.id
-                        JOIN colors c ON r.color = c.id
-                        JOIN categories cat ON r.category = cat.id
-                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                    WHERE r.id = ?"""
-    fetched         = db.query(report_sql, param)
+    fetched         = get_report_details(report_id)
     return render_template("view_report.html", fetched=fetched[0], colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                            report_tastes=report_tastes)
@@ -74,13 +62,25 @@ def view_user(user_id):
     return render_template("view_user.html", user=user_data, reports=user_report_count)
 
 #TODO: potential DoS surface for registered users
-@app.route("/create_report")
-def create_report():
+@app.route("/create_report/")
+def create_report(report_id=None):
     if "user_id" not in session:
         return redirect("/")
+    if report_id is None:
+        report = None
+    else:
+        report = get_report_details(report_id)
+        print(report)
     colors, tastes, culinaryvalues, categories = get_report_strings()
-    return render_template("create_report.html", colors=colors, tastes=tastes, 
+    return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories)
+
+@app.route("/edit_report/<int:report_id>")
+def edit_report(report_id):
+    require_login()
+    owner_id = get_report_owner(report_id)
+    require_ownership(owner_id)
+    return create_report(report_id=report_id)
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
@@ -98,7 +98,7 @@ def send_report():
 
     #TODO: validate input
 
-    uid = get_uid(session["user_id"])
+    uid = get_uid_from_username(session["user_id"])
     sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
                 VALUES (?, datetime('now'), ?, ?, ?, ?)"""
     params = [uid, category, color, culinaryvalue, blanched]
@@ -114,11 +114,6 @@ def send_report():
         db.execute(sql, [report_id, 1]) # mild
 
     return redirect(url_for("view_report", report_id=report_id))
-
-@app.route("/edit_report/<int:report_id>")
-def edit_report():
-    require_login_as(user_id)
-
 
 @app.route("/all_reports")
 def all_reports():
@@ -173,7 +168,7 @@ def create():
         return "Username already taken"
 
     # is this bm?
-    user_id = get_uid(username)
+    user_id = get_uid_from_username(username)
     session["user_id"] = user_id
     return redirect("/")
 
@@ -198,7 +193,7 @@ def logout():
     del session["username"]
     return redirect("/")
 
-def get_uid(username):
+def get_uid_from_username(username):
     sql = "SELECT id FROM users WHERE name = ?"
     return db.query(sql, [username])[0][0]
 
@@ -206,9 +201,13 @@ def require_login():
     if "user_id" not in session:
         abort(403)
 
-def require_ownership(user_id, ):
+def require_ownership(owner_id, ):
     if "user_id" not in session:
-        pass
+        abort(403)
+    user_id = session["user_id"]
+    if user_id != owner_id:
+        print(f"{user_id} != {owner_id}")
+        abort(403)
 
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")
@@ -216,3 +215,27 @@ def get_report_strings():
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
     categories     = db.query("SELECT id, name FROM categories")
     return (colors, tastes, culinaryvalues, categories)
+
+def get_report_owner(report_id):
+    param = (report_id, )
+    sql = """ SELECT uid FROM reports WHERE reports.id = ?"""
+    result = db.query(sql, param)
+    if not result:
+        return None
+    return result[0][0]
+
+def get_report_details(report_id):
+    param = (report_id, )
+    report_sql = """SELECT r.*,
+                    u.name AS user_name,
+                    u.id AS user_id,
+                    c.name AS color_name,
+                    cat.name AS category_name,
+                    cv.name AS culinaryvalue_name
+                    FROM reports r
+                        JOIN users u ON r.uid = u.id
+                        JOIN colors c ON r.color = c.id
+                        JOIN categories cat ON r.category = cat.id
+                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                    WHERE r.id = ?"""
+    return db.query(report_sql, param)[0]

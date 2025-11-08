@@ -5,7 +5,12 @@
 {% endblock %}
 
 {% block content %}
-<div class="report-container"><h1>Report form</h1>
+<div class="report-container">
+    {% if report %}
+        <h1>Edit report {{ report.id }}</h1>
+    {% else %}
+        <h1>Report form</h1>
+    {% endif %}
     <form action="{{ url_for('send_report') }}" method="post">
         <label for="category"><h3>Mushroom category:</h3></label>
         <p><select name="category" id="category">

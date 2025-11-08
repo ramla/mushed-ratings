@@ -50,8 +50,8 @@
             </tr>
         </tbody>
     </table>
-    {% if session.user_id == fetched.user_name %}
-        <p><a class="note" href="{{ url_for('edit_report') }}">Edit report {{ fetched.id }}</a></p>
+    {% if session.user_id == fetched.user_id %}
+        <p><a class="note" href="{{ url_for('edit_report', report_id = fetched.id) }}">Edit report {{ fetched.id }}</a></p>
     {% endif %}
 </div>    
 
