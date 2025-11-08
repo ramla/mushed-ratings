@@ -56,7 +56,7 @@ def view_user(user_id):
     sql_user_report_count = """ SELECT COUNT(*) FROM reports
                                 WHERE reports.uid = ?
     """
-    sql_user_data = """              SELECT id, name, lastlogon, credits FROM users
+    sql_user_data = """         SELECT id, name, lastlogon, credits FROM users
                                 WHERE id = ?
     """
 
