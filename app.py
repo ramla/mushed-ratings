@@ -61,12 +61,16 @@ def view_user(user_id):
     sql_user_data = """         SELECT id, name, lastlogon, credits FROM users
                                 WHERE id = ?
     """
-
-    user_report_count   = db.query(sql_user_report_count, param)[0][0]
-    user_data           = dict(db.query(sql_user_data, param)[0])
+    user_data = db.query(sql_user_data, param)
+    if not user_data:
+        abort(404)
+    user_data = dict(user_data[0])
 
     if not user_data["lastlogon"]:
         user_data["lastlogon"] = "Never"
+
+    user_report_count = db.query(sql_user_report_count, param)[0][0]
+
     return render_template("view_user.html", user=user_data, reports=user_report_count)
 
 #TODO: potential DoS surface for registered users
