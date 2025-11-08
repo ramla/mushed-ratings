@@ -21,22 +21,22 @@ def register():
 
 @app.route("/view_report/<int:report_id>")
 def view_report(report_id):
-    if not "username" in session:
+    if "username" not in session:
         return redirect("/")
 
     colors, tastes, culinaryvalues, categories = get_report_strings()
     param = (report_id,)
-    taste_sql =  """SELECT t.name 
+    taste_sql =  """SELECT t.name
                     FROM tastes t
                         JOIN report_tastes rt ON t.id = rt.tastes_id
                         JOIN reports r        ON r.id = rt.report_id
                     WHERE r.id = ?"""
     report_tastes   = db.query(taste_sql, param)
     print(report_tastes)
-    report_sql = """SELECT r.*, 
-                    u.name AS user_name, 
-                    c.name AS color_name, 
-                    cat.name AS category_name, 
+    report_sql = """SELECT r.*,
+                    u.name AS user_name,
+                    c.name AS color_name,
+                    cat.name AS category_name,
                     cv.name AS culinaryvalue_name
                     FROM reports r
                         JOIN users u ON r.uid = u.id
@@ -49,7 +49,7 @@ def view_report(report_id):
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):
-    if not "username" in session:
+    if "username" not in session:
         return redirect("/")
 
     param = str(user_id)
@@ -62,7 +62,7 @@ def view_user(user_id):
 
     user_report_count   = db.query(sql_user_report_count, param)[0][0]
     user_data           = dict(db.query(sql_user_data, param)[0])
-    
+
     if not user_data["lastlogon"]:
         user_data["lastlogon"] = "Never"
     return render_template("view_user.html", user=user_data, reports=user_report_count)
@@ -70,7 +70,7 @@ def view_user(user_id):
 #TODO: potential DoS surface for registered users
 @app.route("/create_report")
 def create_report():
-    if not "username" in session:
+    if "username" not in session:
         return redirect("/")
     colors, tastes, culinaryvalues, categories = get_report_strings()
     return render_template("create_report.html", colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
@@ -88,7 +88,7 @@ def send_report():
         blanched = 1
     else:
         blanched = 0
-    
+
     #TODO: validate input
 
     uid = get_uid(session["username"])
@@ -124,7 +124,7 @@ def search():
     #TODO: validate input
     #TODO: multiword search how
     keywords = "%" + keywords + "%"
-    sql = """   SELECT r.*, 
+    sql = """   SELECT r.*,
                 u.name AS user_name, 
                 c.name AS color_name, 
                 cat.name AS category_name, 
@@ -171,7 +171,7 @@ def create():
 def login():
     username = request.form["username"]
     password = request.form["password"]
-    redir    = request.form["redirect"]    
+    redir    = request.form["redirect"]
     sql = "SELECT auth FROM users WHERE name = ?"
     password_hash = db.query(sql, [username])[0][0]
 
@@ -193,7 +193,7 @@ def get_uid(username):
 def require_login():
     if "username" not in session:
         abort(403)
-    
+
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")
     tastes         = db.query("SELECT id, name, description FROM tastes")
