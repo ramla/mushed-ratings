@@ -94,3 +94,6 @@ details[open] .toggle-content {
 details[open] summary {
     display: none;
 }
+.navbutton:has(details[open]) + .navspacer {
+    display: none;
+}

@@ -12,11 +12,10 @@
 <body>
     <div class="navbar">
          <a class="navbutton" href="{{ url_for('index') }}">MushEd</a>
+
          <a class="navbutton" href="{{ url_for('create_report') }}">Report form</a>
 
-        <div class="navspacer"></div>
-
-        <div class="navbutton">
+        <div class="navbutton searchbutton">
             <details>
                 <summary>Search</summary>
                     <div class="toggle-content">
@@ -27,6 +26,8 @@
                     </div>
             </details>
         </div>
+
+        <div class="navspacer"></div>
 
         {% if session.user_id %}
              <a class="navbutton" href="/logout">Logout</a>
