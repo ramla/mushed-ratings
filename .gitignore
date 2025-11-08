@@ -6,3 +6,5 @@ muist
 *.swp
 temp
 config.py
+.pylintrc
+.vscode
