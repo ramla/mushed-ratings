@@ -1,7 +1,9 @@
-import sqlite3, db, config
+import sqlite3
 from flask import Flask, url_for
 from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
+import db
+import config
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -90,7 +92,7 @@ def send_report():
     #TODO: validate input
 
     uid = get_uid(session["username"])
-    sql = f"INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) VALUES (?, datetime('now'), ?, ?, ?, ?)"
+    sql = "INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) VALUES (?, datetime('now'), ?, ?, ?, ?)"
     params = [uid, category, color, culinaryvalue, blanched]
     db.execute(sql, params)
     report_id = db.last_insert_id()
@@ -122,7 +124,7 @@ def search():
     #TODO: validate input
     #TODO: multiword search how
     keywords = "%" + keywords + "%"
-    sql = f"""  SELECT r.*, 
+    sql = """   SELECT r.*, 
                 u.name AS user_name, 
                 c.name AS color_name, 
                 cat.name AS category_name, 

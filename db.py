@@ -17,8 +17,10 @@ def execute(sql, params=[]):
 def last_insert_id():
     return g.last_insert_id    
     
-def query(sql, params=[]):
+def query(sql, params=None):
+    if params is None:
+        params = []
     con = get_connection()
     result = con.execute(sql, params).fetchall()
     con.close()
-    return result
+    return 
