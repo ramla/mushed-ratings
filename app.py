@@ -1,6 +1,6 @@
 import sqlite3, db, config
 from flask import Flask
-from flask import redirect, render_template, request, session
+from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -83,6 +83,7 @@ def create_report():
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
+    require_login()
     tastecount    = db.query("SELECT COUNT(*) FROM tastes")[0][0]
     category      = request.form["category"]
     color         = request.form["color"]
@@ -125,6 +126,7 @@ def all_reports():
 
 @app.route("/search", methods=["GET"])
 def search():
+    require_login()
     keywords = request.args.get("query")
     #TODO: validate input
     #TODO: multiword search how
@@ -194,3 +196,7 @@ def logout():
 def get_uid(username):
     sql = "SELECT id FROM users WHERE name = ?"
     return db.query(sql, [username])[0][0]
+
+def require_login():
+    if "username" not in session:
+        abort(403)
