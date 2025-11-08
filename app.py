@@ -70,8 +70,8 @@ def view_user(user_id):
     return render_template("view_user.html", user=user_data, reports=user_report_count)
 
 #TODO: potential DoS surface for registered users
-@app.route("/report")
-def report():
+@app.route("/create_report")
+def create_report():
     if not "username" in session:
         return redirect("/")
 
@@ -79,7 +79,7 @@ def report():
     tastes         = db.query("SELECT id, name, description FROM tastes")
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
     categories     = db.query("SELECT id, name FROM categories")
-    return render_template("report.html", colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
+    return render_template("create_report.html", colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
@@ -112,6 +112,10 @@ def send_report():
 
     return f"Report received <br> {report_id}: {params}, {tastes}"
     #TODO: redirect
+
+@app.route("/edit_report")
+def edit_report():
+    pass
 
 @app.route("/all_reports")
 def all_reports():

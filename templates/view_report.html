@@ -50,35 +50,9 @@
             </tr>
         </tbody>
     </table>
-    <details>
-        <summary>Edit report {{ fetched.id }}</summary>
-            <div class="toggle-content">
-                <form action="/send_report" method="post">
-                    <label for="category"><h3>Mushroom category:</h3></label>
-                    <p><select name="category" id="category">
-                        {% for id,name in categories %}
-                        <option value="{{ id }}" {% if fetched.category == id%} selected {% endif %}>{{ name }}</option>
-                        {% endfor %}
-                    </select></p>
-                    <label for="color"><h3>Colour of the mushroom:</h3></label>
-                    <div class="color-grid">
-                        {% for id,color,hex in colors %}
-                        <input type="radio" id="{{ id }}" name="color" value="{{ id }}" {% if fetched.color == id %} checked {% endif %}>
-                        <label for="{{ id }}" class="color-option" style="background-color: {{ hex }};"></label>
-                        {% endfor %}
-                    </div>
-                    <h3>Culinary value:</h3>
-                    <select name="culvalue">
-                        {% for id,name,description in culvalues %}
-                        <option value="{{ id }}" {% if fetched.culinaryvalue == id%} selected {% endif %}>{{ name }}</option>
-                        {% endfor %}
-                    </select>
-                    <p><input type="checkbox" id="blanched" name="blanched" value="True" {% if fetched.blanched %} checked {% endif %} />
-                    <label for="blanched">Blanched before use</label></p>
-                    <input type="submit" value="Submit">
-                </form>
-            </div>
-    </details>
+    {% if session.username == fetched.user_name %}
+        <p><a class="note" href="{{ url_for('edit_report') }}">Edit report {{ fetched.id }}</a></p>
+    {% endif %}
 </div>    
 
 {% else %}

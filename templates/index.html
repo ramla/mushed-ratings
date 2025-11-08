@@ -3,7 +3,7 @@
 {% block content %}
   <div class="base-container"><h1>MushEd Ratings</h1>
     <!-- TODO: welcome message for those logged in  -->
-    <p>Good day! You have been chosen to sample mushrooms on a newly found exoplanet. <a href="{{ url_for('register') }}">Create your account now</a> and <a href="/report">report your findings</a> to claim credits. 1 000 000 credits earns you a trip back home and a gratis liver sample analysis. Remember to check back on <a href="/all_reports">what others have tasted</a>!</p>
+    <p>Good day! You have been chosen to sample mushrooms on a newly found exoplanet. <a href="{{ url_for('register') }}">Create your account now</a> and <a href="{{ url_for('create_report') }}">report your findings</a> to claim credits. 1 000 000 credits earns you a trip back home and a gratis liver sample analysis. Remember to check back on <a href="{{ url_for('all_reports') }}">what others have tasted</a>!</p>
     {% if session.username %}
     <p>
       Logged in as {{ session.username }}
