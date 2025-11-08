@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{% if session.username %}
+{% if session.user_id %}
 <div class="base-container">
 <h2>Sampling report</h2>
     <table>
@@ -50,7 +50,7 @@
             </tr>
         </tbody>
     </table>
-    {% if session.username == fetched.user_name %}
+    {% if session.user_id == fetched.user_name %}
         <p><a class="note" href="{{ url_for('edit_report') }}">Edit report {{ fetched.id }}</a></p>
     {% endif %}
 </div>    

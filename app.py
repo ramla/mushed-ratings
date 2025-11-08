@@ -21,7 +21,7 @@ def register():
 
 @app.route("/view_report/<int:report_id>")
 def view_report(report_id):
-    if "username" not in session:
+    if "user_id" not in session:
         return redirect("/")
 
     colors, tastes, culinaryvalues, categories = get_report_strings()
@@ -51,7 +51,7 @@ def view_report(report_id):
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):
-    if "username" not in session:
+    if "user_id" not in session:
         return redirect("/")
 
     param = str(user_id)
@@ -72,7 +72,7 @@ def view_user(user_id):
 #TODO: potential DoS surface for registered users
 @app.route("/create_report")
 def create_report():
-    if "username" not in session:
+    if "user_id" not in session:
         return redirect("/")
     colors, tastes, culinaryvalues, categories = get_report_strings()
     return render_template("create_report.html", colors=colors, tastes=tastes, 
@@ -94,7 +94,7 @@ def send_report():
 
     #TODO: validate input
 
-    uid = get_uid(session["username"])
+    uid = get_uid(session["user_id"])
     sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
                 VALUES (?, datetime('now'), ?, ?, ?, ?)"""
     params = [uid, category, color, culinaryvalue, blanched]
@@ -111,9 +111,10 @@ def send_report():
 
     return redirect(url_for("view_report", report_id=report_id))
 
-@app.route("/edit_report")
+@app.route("/edit_report/<int:report_id>")
 def edit_report():
-    pass
+    require_login_as(user_id)
+
 
 @app.route("/all_reports")
 def all_reports():
@@ -168,7 +169,8 @@ def create():
         return "Username already taken"
 
     # is this bm?
-    session["username"] = username
+    user_id = get_uid(username)
+    session["user_id"] = user_id
     return redirect("/")
 
 @app.route("/login", methods=["POST"])
@@ -176,10 +178,11 @@ def login():
     username = request.form["username"]
     password = request.form["password"]
     redir    = request.form["redirect"]
-    sql = "SELECT auth FROM users WHERE name = ?"
-    password_hash = db.query(sql, [username])[0][0]
+    sql = "SELECT auth, id FROM users WHERE name = ?"
+    password_hash, user_id = db.query(sql, [username])[0]
 
     if check_password_hash(password_hash, password):
+        session["user_id"] = user_id
         session["username"] = username
         return redirect(redir)
     else:
@@ -187,6 +190,7 @@ def login():
 
 @app.route("/logout")
 def logout():
+    del session["user_id"]
     del session["username"]
     return redirect("/")
 
@@ -195,8 +199,12 @@ def get_uid(username):
     return db.query(sql, [username])[0][0]
 
 def require_login():
-    if "username" not in session:
+    if "user_id" not in session:
         abort(403)
+
+def require_ownership(user_id, ):
+    if "user_id" not in session:
+        pass
 
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")
