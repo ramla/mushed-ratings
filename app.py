@@ -45,7 +45,9 @@ def view_report(report_id):
                         JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
                     WHERE r.id = ?"""
     fetched         = db.query(report_sql, param)
-    return render_template("view_report.html", fetched=fetched[0], colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories, report_tastes=report_tastes)
+    return render_template("view_report.html", fetched=fetched[0], colors=colors, 
+                           tastes=tastes, culvalues=culinaryvalues, categories=categories, 
+                           report_tastes=report_tastes)
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):
@@ -73,7 +75,8 @@ def create_report():
     if "username" not in session:
         return redirect("/")
     colors, tastes, culinaryvalues, categories = get_report_strings()
-    return render_template("create_report.html", colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
+    return render_template("create_report.html", colors=colors, tastes=tastes, 
+                           culvalues=culinaryvalues, categories=categories)
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
@@ -92,7 +95,8 @@ def send_report():
     #TODO: validate input
 
     uid = get_uid(session["username"])
-    sql = "INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) VALUES (?, datetime('now'), ?, ?, ?, ?)"
+    sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
+                VALUES (?, datetime('now'), ?, ?, ?, ?)"""
     params = [uid, category, color, culinaryvalue, blanched]
     db.execute(sql, params)
     report_id = db.last_insert_id()
