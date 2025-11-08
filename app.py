@@ -1,5 +1,5 @@
 import sqlite3, db, config
-from flask import Flask
+from flask import Flask, url_for
 from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -11,7 +11,6 @@ def index():
     db.execute("INSERT INTO visits (visited_at) VALUES (datetime('now'))")
     result = db.query("SELECT COUNT(*) FROM visits")
     paragraph = "Page loaded " + str(result[0][0]) + " times"
-    print(result)
     return render_template("index.html", visits=paragraph)
 
 @app.route("/register")
@@ -23,11 +22,8 @@ def view_report(report_id):
     if not "username" in session:
         return redirect("/")
 
+    colors, tastes, culinaryvalues, categories = get_report_strings()
     param = (report_id,)
-    colors          = db.query("SELECT id, name, hex FROM colors")
-    tastes          = db.query("SELECT id, name, description FROM tastes")
-    culinaryvalues  = db.query("SELECT id, name, description FROM culinaryvalues")
-    categories      = db.query("SELECT id, name FROM categories")
     taste_sql =  """SELECT t.name 
                     FROM tastes t
                         JOIN report_tastes rt ON t.id = rt.tastes_id
@@ -74,11 +70,7 @@ def view_user(user_id):
 def create_report():
     if not "username" in session:
         return redirect("/")
-
-    colors         = db.query("SELECT id, name, hex FROM colors")
-    tastes         = db.query("SELECT id, name, description FROM tastes")
-    culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
-    categories     = db.query("SELECT id, name FROM categories")
+    colors, tastes, culinaryvalues, categories = get_report_strings()
     return render_template("create_report.html", colors=colors, tastes=tastes, culvalues=culinaryvalues, categories=categories)
 
 @app.route("/send_report", methods=["POST"])
@@ -111,8 +103,7 @@ def send_report():
     if tastes_inserted == 0:
         db.execute(sql, [report_id, 1]) # mild
 
-    return f"Report received <br> {report_id}: {params}, {tastes}"
-    #TODO: redirect
+    return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/edit_report")
 def edit_report():
@@ -200,3 +191,10 @@ def get_uid(username):
 def require_login():
     if "username" not in session:
         abort(403)
+    
+def get_report_strings():
+    colors         = db.query("SELECT id, name, hex FROM colors")
+    tastes         = db.query("SELECT id, name, description FROM tastes")
+    culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
+    categories     = db.query("SELECT id, name FROM categories")
+    return (colors, tastes, culinaryvalues, categories)
