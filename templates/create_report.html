@@ -8,10 +8,11 @@
 <div class="report-container">
     {% if report %}
         <h1>Edit report {{ report.id }}</h1>
+    <form action="{{ url_for('send_report_edit', report_id=report.id) }}" method="post">
     {% else %}
         <h1>Report form</h1>
-    {% endif %}
     <form action="{{ url_for('send_report') }}" method="post">
+    {% endif %}
         <label for="category"><h3>Mushroom category:</h3></label>
         <p><select name="category" id="category">
             <option value="-1">Select one</option>

@@ -77,21 +77,42 @@ def edit_report(report_id):
     require_ownership(owner_id)
     return create_report(report_id=report_id)
 
+@app.route("/send_report_edit/<int:report_id>", methods=["POST"])
+def send_report_edit(report_id):
+    require_login()
+    owner_id = get_report_owner(report_id)
+    require_ownership(owner_id)
+
+    category_new, color_new, culinaryvalue_new, blanched_new, tastes_new = get_reportform_contents()
+    if not tastes_valid(tastes_new):
+            abort(418)
+    category, color, culinaryvalue, blanched, tastes = get_report_raw(report_id)
+    if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new and blanched == blanched_new):
+        print([category_new, color_new, culinaryvalue_new, blanched_new, report_id])
+        sql = """
+            UPDATE reports SET category = ?, color = ?, culinaryvalue = ?, blanched = ?
+            WHERE id = ?
+        """
+        db.execute(sql, [category_new, color_new, culinaryvalue_new, blanched_new, report_id])
+    if not tastes == tastes_new:
+        delete_tastes_sql = """
+            DELETE FROM report_tastes
+            WHERE report_id = ?
+        """
+        db.execute(delete_tastes_sql, [report_id, ])
+            
+        taste_sql = "INSERT INTO report_tastes (report_id, tastes_id) VALUES (?, ?);\n"
+        for taste in tastes_new:
+            params = [report_id, taste]
+            db.execute(taste_sql, params)
+    
+    return redirect(url_for("view_report", report_id=report_id))
+
+
 @app.route("/send_report", methods=["POST"])
 def send_report():
     require_login()
-    tastecount    = db.query("SELECT COUNT(*) FROM tastes")[0][0]
-    category      = request.form["category"]
-    color         = request.form["color"]
-    tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]
-    culinaryvalue = request.form["culvalue"]
-    blanched      = request.form.get("blanched")
-    if blanched:
-        blanched = 1
-    else:
-        blanched = 0
-
-    #TODO: validate input
+    category, color, culinaryvalue, blanched, tastes = get_reportform_contents()
 
     uid = session["user_id"]
     sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
@@ -220,7 +241,7 @@ def get_report_owner(report_id):
     return result[0][0]
 
 def get_report_details(report_id):
-    param = (report_id, )                    #TARVII CV ID:N EDITTII
+    param = (report_id, )
     report_sql = """SELECT r.*,
                     u.name AS user_name,
                     u.id AS user_id,
@@ -253,3 +274,35 @@ def get_report_tastes(report_id):
                     WHERE r.id = ?"""
     param = (report_id,)
     return db.query(taste_sql, param)
+
+def get_reportform_contents():
+    tastecount    = db.query("SELECT COUNT(*) FROM tastes")[0][0]
+    category      = request.form["category"]
+    color         = request.form["color"]
+    tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]
+    culinaryvalue = request.form["culvalue"]
+    blanched      = request.form.get("blanched")
+    if blanched:
+        blanched = 1
+    else:
+        blanched = 0
+    
+    #TODO: validate input
+    
+    return (category, color, culinaryvalue, blanched, tastes)
+
+def get_report_raw(report_id):
+    param = (report_id, )
+    report_sql = """SELECT r.category, r.color, r.culinaryvalue, r.blanched
+                    FROM reports r
+                        JOIN users u ON r.uid = u.id
+                        JOIN colors c ON r.color = c.id
+                        JOIN categories cat ON r.category = cat.id
+                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                    WHERE r.id = ?"""
+    category, color, culinaryvalue, blanched = db.query(report_sql, param)[0]
+    tastes = get_report_tastes(report_id)
+    return (category, color, culinaryvalue, blanched, tastes)
+
+def tastes_valid(tastes):
+    return True #TODO
