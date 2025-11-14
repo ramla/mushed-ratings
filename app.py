@@ -58,6 +58,7 @@ def view_user(user_id):
 #TODO: potential DoS surface for registered users
 @app.route("/create_report/")
 def create_report(report_id=None):
+    taste_ids = []
     if "user_id" not in session:
         return redirect("/")
     if report_id is None:
