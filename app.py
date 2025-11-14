@@ -65,7 +65,6 @@ def create_report(report_id=None):
     else:
         report = get_report_details(report_id)
         taste_ids = [ id[0] for id in get_report_tastes(report_id) ]
-        print(taste_ids)
     colors, tastes, culinaryvalues, categories = get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
@@ -88,7 +87,6 @@ def send_report_edit(report_id):
             abort(418)
     category, color, culinaryvalue, blanched, tastes = get_report_raw(report_id)
     if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new and blanched == blanched_new):
-        print([category_new, color_new, culinaryvalue_new, blanched_new, report_id])
         sql = """
             UPDATE reports SET category = ?, color = ?, culinaryvalue = ?, blanched = ?
             WHERE id = ?
@@ -159,12 +157,6 @@ def search():
                     OR cat.name LIKE LOWER(?)
                     OR cv.name LIKE LOWER(?);"""
     result = db.query(sql, [keywords, keywords, keywords, keywords])
-    print(result)
-    for row in result:
-        print(row)
-        for item in row:
-            print(item,end=", ")
-        print("\n")
     return render_template("search.html", data=result)
 
 @app.route("/create", methods=["POST"])
@@ -222,7 +214,7 @@ def require_ownership(owner_id, ):
         abort(403)
     user_id = session["user_id"]
     if user_id != owner_id:
-        print(f"{user_id} != {owner_id}")
+        print(f"Suspicious activity - require_ownership abort: {user_id} != {owner_id}")
         abort(403)
 
 def get_report_strings():
