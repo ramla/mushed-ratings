@@ -25,15 +25,9 @@ def view_report(report_id):
         return redirect("/")
 
     colors, tastes, culinaryvalues, categories = get_report_strings()
-    param = (report_id,)
-    taste_sql =  """SELECT t.name
-                    FROM tastes t
-                        JOIN report_tastes rt ON t.id = rt.tastes_id
-                        JOIN reports r        ON r.id = rt.report_id
-                    WHERE r.id = ?"""
-    report_tastes   = db.query(taste_sql, param)
-    fetched         = get_report_details(report_id)
-    return render_template("view_report.html", fetched=fetched[0], colors=colors, 
+    report_tastes = get_report_taste_strings(report_id)
+    fetched       = get_report_details(report_id)
+    return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                            report_tastes=report_tastes)
 
@@ -70,10 +64,11 @@ def create_report(report_id=None):
         report = None
     else:
         report = get_report_details(report_id)
-        print(report)
+        taste_ids = [ id[0] for id in get_report_tastes(report_id) ]
+        print(taste_ids)
     colors, tastes, culinaryvalues, categories = get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
-                           culvalues=culinaryvalues, categories=categories)
+                           culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
 
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
@@ -98,7 +93,7 @@ def send_report():
 
     #TODO: validate input
 
-    uid = get_uid_from_username(session["user_id"])
+    uid = session["user_id"]
     sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
                 VALUES (?, datetime('now'), ?, ?, ?, ?)"""
     params = [uid, category, color, culinaryvalue, blanched]
@@ -225,13 +220,14 @@ def get_report_owner(report_id):
     return result[0][0]
 
 def get_report_details(report_id):
-    param = (report_id, )
+    param = (report_id, )                    #TARVII CV ID:N EDITTII
     report_sql = """SELECT r.*,
                     u.name AS user_name,
                     u.id AS user_id,
                     c.name AS color_name,
                     cat.name AS category_name,
-                    cv.name AS culinaryvalue_name
+                    cv.name AS culinaryvalue_name,
+                    cv.id AS culinaryvalue_id
                     FROM reports r
                         JOIN users u ON r.uid = u.id
                         JOIN colors c ON r.color = c.id
@@ -239,3 +235,21 @@ def get_report_details(report_id):
                         JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
                     WHERE r.id = ?"""
     return db.query(report_sql, param)[0]
+
+def get_report_taste_strings(report_id):
+    taste_sql =  """SELECT t.name
+                    FROM tastes t
+                        JOIN report_tastes rt ON t.id = rt.tastes_id
+                        JOIN reports r        ON r.id = rt.report_id
+                    WHERE r.id = ?"""
+    param = (report_id,)
+    return db.query(taste_sql, param)
+
+def get_report_tastes(report_id):
+    taste_sql =  """SELECT t.id
+                    FROM tastes t
+                        JOIN report_tastes rt ON t.id = rt.tastes_id
+                        JOIN reports r        ON r.id = rt.report_id
+                    WHERE r.id = ?"""
+    param = (report_id,)
+    return db.query(taste_sql, param)

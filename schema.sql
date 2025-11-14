@@ -35,7 +35,7 @@ CREATE TABLE reports (
   deleted INTEGER DEFAULT 0,
   FOREIGN KEY(uid) REFERENCES users(id),
   FOREIGN KEY(color) REFERENCES colors(id),
-  FOREIGN KEY(category) REFERENCES categories(id)
+  FOREIGN KEY(category) REFERENCES categories(id),
   FOREIGN KEY(culinaryvalue) REFERENCES culinaryvalues(id)
 );
 
@@ -45,10 +45,10 @@ CREATE TABLE symptomreport (
   date DATE,
   report_id INTEGER,
   healthvalue INTEGER,
-  deleted INTEGER DEFAULT 0
+  deleted INTEGER DEFAULT 0,
   FOREIGN KEY(report_id) REFERENCES reports(id),
   FOREIGN KEY(healthvalue) REFERENCES healthvalues(id)
-)
+);
 
 CREATE TABLE colors (
   id INTEGER PRIMARY KEY,

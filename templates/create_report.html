@@ -16,14 +16,14 @@
         <p><select name="category" id="category">
             <option value="-1">Select one</option>
             {% for id,name in categories %}
-            <option value="{{ id }}">{{ name }}</option>
+            <option value="{{ id }}"{% if report %}{% if report.category == id %} selected{% endif %}{% endif %}>{{ name }}</option>
             {% endfor %}
         </select></p>
         <label for="color"><h3>Colour of the mushroom:</h3></label>
         <div class="color-grid">
             {% for id,color,hex in colors %}
             <div class="color-option">
-                <input type="radio" id="{{ id }}" name="color" value="{{ id }}">
+                <input type="radio" id="{{ id }}" name="color" value="{{ id }}"{% if report %}{% if report.color == id %}checked{% endif %}{% endif %}  >{{ name }}
                 <label for="{{ id }}" class="color-option" style="background-color: {{ hex }};" title="{{ color }}"></label>
             </div>
             {% endfor %}
@@ -34,7 +34,7 @@
                 <div class="column">
                     {% for row in col %}
                         <label title="{{ row.description }}">
-                            <input type="checkbox" name="taste{{ row.id }}" {% if row.id == 1 %}checked{% endif %}> {{ row.name }}
+                            <input type="checkbox" name="taste{{ row.id }}" {% if report %}{% if row.id in taste_ids %}checked{% endif %}{% else %}{% if row.id == 1 %}checked{% endif %}{% endif %}> {{ row.name }}
                         </label>
                     <br>
                     {% endfor %}
@@ -45,11 +45,11 @@
         <select name="culvalue">
             <option value="-1">Select one</option>
             {% for id,name,description in culvalues %}
-            <option value="{{ id }}">{{ name }}</option>
+            <option value="{{ id }}"{% if report %}{% if report.culinaryvalue_id == id %}selected{% endif %}{% endif %}>{{ name }}</option>
             {% endfor %}
         </select>
         <h3>Pretreatment:</h3>
-        <p><input type="checkbox" id="blanched" name="blanched" value="True" />
+        <p><input type="checkbox" id="blanched" name="blanched" value="True" {% if report %}{% if report.blanched %}checked{% endif %}{% endif %}/>
         <label for="blanched">Blanched before use</label></p>
         <input type="submit" value="Submit">
     </form>
