@@ -8,6 +8,7 @@
 <div class="report-container">
     {% if report %}
         <h1>Edit report {{ report.id }}</h1>
+    <p><a href="{{ url_for('delete_report', report_id=report.id) }}">Delete report</a></p>
     <form action="{{ url_for('send_report_edit', report_id=report.id) }}" method="post">
     {% else %}
         <h1>Report form</h1>

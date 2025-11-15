@@ -130,6 +130,19 @@ def send_report():
 
     return redirect(url_for("view_report", report_id=report_id))
 
+@app.route("/delete_report/<int:report_id>")
+def delete_report(report_id):
+    require_login()
+    owner_id = get_report_owner(report_id)
+    require_ownership(owner_id)
+
+    sql = """
+            UPDATE reports SET deleted = 1
+            WHERE id = ?
+            """
+    db.execute(sql, [report_id, ])
+    return redirect(url_for("view_report", report_id=report_id))
+
 @app.route("/all_reports")
 def all_reports():
     sql = "SELECT * FROM reports"
