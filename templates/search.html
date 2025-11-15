@@ -22,15 +22,27 @@
         </thead>
         <tbody>
             {% for row in data %}
-            <tr>
-                <td><a href="{{ url_for('view_report', report_id=row.id) }}">Report {{ row.id }}</a></td>  <!-- ID -->
-                <td><a href="{{ url_for('view_user', user_id=row.uid) }}">{{ row.user_name }}</a></td>  <!-- UID  -->
-                <td>{{ row.date }}</td>  <!-- Date -->
-                <td><a href="{{ url_for('search', query=row.category_name) }}">{{ row.category_name }}</a></td>  <!-- Category -->
-                <td><a href="{{ url_for('search', query=row.color_name) }}">{{ row.color_name }}</a></td>  <!-- Color -->
-                <td><a href="{{ url_for('search', query=row.culinaryvalue_name) }}">{{ row.culinaryvalue_name }}</a></td>  <!-- Culinary Value -->
-                <td>{{ row.blanched }}</td>  <!-- Blanched (Boolean) -->
-            </tr>
+                {% if row.deleted %}
+                <tr>
+                    <td>Report {{ row.id }}</td>
+                    <td>{{ row.user_name }}</td>
+                    <td>-</td>
+                    <td>deleted</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td><a href="{{ url_for('view_report', report_id=row.id) }}">Report {{ row.id }}</a></td>
+                    <td><a href="{{ url_for('view_user', user_id=row.uid) }}">{{ row.user_name }}</a></td>
+                    <td>{{ row.date }}</td>
+                    <td><a href="{{ url_for('search', query=row.category_name) }}">{{ row.category_name }}</a></td>
+                    <td><a href="{{ url_for('search', query=row.color_name) }}">{{ row.color_name }}</a></td>
+                    <td><a href="{{ url_for('search', query=row.culinaryvalue_name) }}">{{ row.culinaryvalue_name }}</a></td>
+                    <td>{{ row.blanched }}</td>
+                </tr>
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
