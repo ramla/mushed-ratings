@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Table Display</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='base.css') }}">
     <style>
         table {
             width: 100%;
             border-collapse: collapse;
         }
         th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #777;
             padding: 8px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #282828;
         }
     </style>
 </head>
@@ -34,7 +35,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for id,uid,date,category,color,culinaryvalue,blanched in data %}
+            {% for id,uid,date,category,color,culinaryvalue,blanched,deleted in data %}
+            {% if deleted %}
+            <tr>
+                <td>{{ id }}</td>
+                <td>{{ uid }}</td>
+                <td>{{ date }}</td>
+                <td>deleted</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+            {% else %}
             <tr>
                 <td>{{ id }}</td>  <!-- ID -->
                 <td>{{ uid }}</td>  <!-- UID  -->
@@ -44,6 +56,7 @@
                 <td>{{ culinaryvalue }}</td>  <!-- Culinary Value -->
                 <td>{{ blanched }}</td>  <!-- Blanched (Boolean) -->
             </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
