@@ -149,6 +149,10 @@ def all_reports():
     reports = db.query(sql)
     return render_template("reports.html", data=reports)
 
+@app.route("/report_fatality/<int:user_id>")
+def report_fatality(user_id):
+    return "not yet implemented"
+
 @app.route("/search", methods=["GET"])
 def search():
     require_login()

@@ -97,3 +97,12 @@ details[open] summary {
 .navbutton:has(details[open]) + .navspacer {
     display: none;
 }
+.fine-print {
+    font-size: 40%;
+    color: var(--color-altbackground);
+}
+.faq {
+    font-size: 120%;
+    line-height: 150%;
+    text-indent: 2ch;
+}

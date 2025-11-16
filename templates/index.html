@@ -2,13 +2,36 @@
 
 {% block content %}
   <div class="base-container"><h1>MushEd Ratings</h1>
-    <!-- TODO: welcome message for those logged in  -->
-    <p>Good day! You have been chosen to sample mushrooms on a newly found exoplanet. <a href="{{ url_for('register') }}">Create your account now</a> and <a href="{{ url_for('create_report') }}">report your findings</a> to claim credits. 1 000 000 credits earns you a trip back home and a gratis liver sample analysis. Remember to check back on <a href="{{ url_for('all_reports') }}">what others have tasted</a>!</p>
+    <p>Welcome to MushEd, the most trusted Mushroom Edibility Tracker!</p>
     {% if session.user_id %}
     <p>
-      Logged in as {{ session.username }}
+      Logged in as <a href="{{ url_for('view_user', user_id=session.user_id) }}">{{ session.username }}</a>.
+    </p> 
+    <p>
+      Not {{session.username}}? <a href="/logout">Logout</a> or <a href="{{ url_for('report_fatality', user_id=session.user_id) }}">report the departed</a>.
     </p>
     {% else %}
+      <div class="info-expander">
+          <details>
+              <summary class="faq">Why am I here?</summary>
+                  <div class="toggle-info">
+                    <p>Good day! You have been chosen to sample mushrooms on a newly found exoplanet. 
+                      Enjoy the local fungi in your cuisine and share your findings to gain credits* for your trouble.
+                      1 000 000 credits earns you a trip back home and a gratis liver sample analysis. 
+                  </div>
+          </details>
+      </div>
+      <div class="info-expander">
+          <details>
+              <summary class="faq">How do I proceed?</summary>
+                  <div class="toggle-info">
+                      <a href="{{ url_for('register') }}">Create your account now</a> and 
+                      <a href="{{ url_for('create_report') }}">report your findings</a> to claim your well earned credits*. 
+                      Remember to check back on <a href="{{ url_for('all_reports') }}">what others have tasted</a>!</p>
+                      <span class="fine-print">* Not yet implemented</span>
+                  </div>
+          </details>
+      </div>
     <p>Log in</p>
     <form action="/login" method="post">
       <p>
