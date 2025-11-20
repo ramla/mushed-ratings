@@ -151,7 +151,7 @@ def all_reports():
 
 @app.route("/report_fatality/<int:user_id>")
 def report_fatality(user_id):
-    return "not yet implemented"
+    return "not yet implemented, please contact support"
 
 @app.route("/search", methods=["GET"])
 def search():
