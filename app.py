@@ -193,8 +193,8 @@ def create():
     except sqlite3.IntegrityError:
         return "Username already taken"
 
-    # is this bm?
     user_id = get_uid_from_username(username)
+    session["username"] = username
     session["user_id"] = user_id
     return redirect("/")
 
@@ -215,8 +215,7 @@ def login():
 
 @app.route("/logout")
 def logout():
-    del session["user_id"]
-    del session["username"]
+    session.clear()
     return redirect("/")
 
 def get_uid_from_username(username):
