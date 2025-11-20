@@ -18,3 +18,12 @@ th, td {
     text-align: left;
     vertical-align: top;
 }
+.colorblock {
+    width: 1em;
+    height: 1em;
+    margin: 0px;
+    margin-right: 0.4em;
+    border: 0.1em solid var(--color-text);
+    display: inline-block;
+    box-sizing: border-box;
+}
