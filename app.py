@@ -70,6 +70,19 @@ def create_report(report_id=None):
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
 
+@app.route("/create_symptom_report/<int:report_id>")
+def create_symptom_report(report_id):
+    require_login()
+    if report_exists(report_id):
+        report = get_report_details(report_id)
+        taste_ids = [ id[0] for id in get_report_tastes(report_id) ]
+        colors, tastes, culinaryvalues, categories = get_report_strings()
+        return render_template("create_symptom_report.html", fetched=report, colors=colors, 
+                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
+                            taste_ids=taste_ids)
+    else: 
+        return "no report found with given id"
+
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
     require_login()
@@ -315,3 +328,10 @@ def get_report_raw(report_id):
 
 def tastes_valid(tastes):
     return True #TODO
+
+def report_exists(report_id):
+    param = (report_id, )
+    sql = """SELECT 1 FROM reports
+                WHERE reports.id = ?
+                    AND reports.deleted = 0"""
+    return db.query(sql, param)
