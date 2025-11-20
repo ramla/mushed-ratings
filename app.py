@@ -24,7 +24,7 @@ def view_report(report_id):
     if "user_id" not in session:
         return redirect("/")
 
-    colors, tastes, culinaryvalues, categories = get_report_strings()
+    colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
     report_tastes = get_report_taste_strings(report_id)
     fetched       = get_report_details(report_id)
     return render_template("view_report.html", fetched=fetched, colors=colors, 
@@ -66,7 +66,7 @@ def create_report(report_id=None):
     else:
         report = get_report_details(report_id)
         taste_ids = [ id[0] for id in get_report_tastes(report_id) ]
-    colors, tastes, culinaryvalues, categories = get_report_strings()
+    colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
 
@@ -75,13 +75,17 @@ def create_symptom_report(report_id):
     require_login()
     if report_exists(report_id):
         report = get_report_details(report_id)
-        taste_ids = [ id[0] for id in get_report_tastes(report_id) ]
-        colors, tastes, culinaryvalues, categories = get_report_strings()
+        report_tastes = get_report_taste_strings(report_id)
+        colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
         return render_template("create_symptom_report.html", fetched=report, colors=colors, 
                             tastes=tastes, culvalues=culinaryvalues, categories=categories, 
-                            taste_ids=taste_ids)
+                            report_tastes=report_tastes, healthvalues=healthvalues)
     else: 
         return "no report found with given id"
+
+@app.route("/send_symptom_report", methods=["POST"])
+def send_symptom_report():
+    pass
 
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
@@ -252,7 +256,8 @@ def get_report_strings():
     tastes         = db.query("SELECT id, name, description FROM tastes")
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
     categories     = db.query("SELECT id, name FROM categories")
-    return (colors, tastes, culinaryvalues, categories)
+    healthvalues   = db.query("SELECT id, name, description FROM healthvalues")
+    return (colors, tastes, culinaryvalues, categories, healthvalues)
 
 def get_report_owner(report_id):
     param = (report_id, )
@@ -268,6 +273,7 @@ def get_report_details(report_id):
                     u.name AS user_name,
                     u.id AS user_id,
                     c.name AS color_name,
+                    c.hex AS color_hex,
                     cat.name AS category_name,
                     cv.name AS culinaryvalue_name,
                     cv.id AS culinaryvalue_id
