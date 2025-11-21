@@ -11,10 +11,7 @@ app.secret_key = config.secret_key
 
 @app.route("/")
 def index():
-    db.execute("INSERT INTO visits (visited_at) VALUES (datetime('now'))")
-    result = db.query("SELECT COUNT(*) FROM visits")
-    paragraph = "Page loaded " + str(result[0][0]) + " times"
-    return render_template("index.html", visits=paragraph)
+    return render_template("index.html")
 
 @app.route("/register")
 def register():
@@ -37,22 +34,15 @@ def view_user(user_id):
     if "user_id" not in session:
         return redirect("/")
 
-    param = str(user_id)
-    sql_user_report_count = """ SELECT COUNT(*) FROM reports
-                                WHERE reports.uid = ?
-    """
-    sql_user_data = """         SELECT id, name, lastlogon, credits FROM users
-                                WHERE id = ?
-    """
-    user_data = db.query(sql_user_data, param)
+    user_data = query.get_user_data(user_id)
     if not user_data:
         abort(404)
-    user_data = dict(user_data[0])
 
+    user_data = dict(user_data[0])
     if not user_data["lastlogon"]:
         user_data["lastlogon"] = "Never"
 
-    user_report_count = db.query(sql_user_report_count, param)[0][0]
+    user_report_count = query.get_user_report_count(user_id)
 
     return render_template("view_user.html", user=user_data, reports=user_report_count)
 
@@ -250,7 +240,7 @@ def require_ownership(owner_id, ):
         abort(403)
 
 def get_reportform_contents():
-    tastecount    = db.query("SELECT COUNT(*) FROM tastes")[0][0]
+    tastecount    = query.get_availabe_tastes_count()
     category      = request.form["category"]
     color         = request.form["color"]
     tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]

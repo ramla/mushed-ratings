@@ -1,6 +1,10 @@
 import db
 
 
+def get_availabe_tastes_count():
+    return db.query("SELECT COUNT(id) FROM tastes")[0][0]
+
+
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")
     tastes         = db.query("SELECT id, name, description FROM tastes")
@@ -83,3 +87,19 @@ def report_exists(report_id):
 def get_uid_from_username(username):
     sql = "SELECT id FROM users WHERE name = ?"
     return db.query(sql, [username])[0][0]
+
+
+def get_user_data(user_id):
+    param = str(user_id)
+    sql_user_data = """         SELECT id, name, lastlogon, credits FROM users
+                                WHERE id = ?
+    """
+    return db.query(sql_user_data, param)
+
+
+def get_user_report_count(user_id):
+    param = (user_id, )
+    sql_user_report_count = """ SELECT COUNT(*) FROM reports
+                                WHERE reports.uid = ?
+    """
+    return db.query(sql_user_report_count, param)[0][0]
