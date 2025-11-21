@@ -90,6 +90,11 @@ def report_exists(report_id):
     return db.query(sql, param)
 
 
+def report_exists_with(category, color, culinaryvalue, tastes):
+    #TODO
+    pass
+
+
 def get_search_results(keywords):
     keywords = "%" + keywords + "%"
     sql = """   SELECT r.*,

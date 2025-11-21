@@ -274,11 +274,14 @@ def validate_username(username):
             return f"username may only contain {allowed_username_characters}"
 
 def validate_reportform_contents(category, color, culinaryvalue, tastes):
-    if not int(category) in range(1,16):
+    if not category in [str(i) for i in range(1,16)]:
             abort(418)
-    if not int(color) in range(1,343):
+    if not color in [str(i) for i in range(1,343)]:
             abort(418)
-    if not int(culinaryvalue) in range(1,4):
+    if not culinaryvalue in [str(i) for i in range(1,4)]:
             abort(418)
     if not tastes_valid(tastes):
             abort(418)
+    if query.report_exists_with(category=category, color=color, culinaryvalue=culinaryvalue, tastes=tastes):
+        #TODO
+        pass
