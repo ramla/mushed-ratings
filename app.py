@@ -4,7 +4,7 @@ from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 import config
-from query import get_report_details, get_report_owner, get_report_raw, get_report_strings, get_report_taste_strings, get_report_taste_ids, get_uid_from_username, report_exists
+import query
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -25,9 +25,9 @@ def view_report(report_id):
     if "user_id" not in session:
         return redirect("/")
 
-    colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
-    report_tastes = get_report_taste_strings(report_id)
-    fetched       = get_report_details(report_id)
+    colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
+    report_tastes = query.get_report_taste_strings(report_id)
+    fetched       = query.get_report_details(report_id)
     return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                            report_tastes=report_tastes)
@@ -65,19 +65,19 @@ def create_report(report_id=None):
     if report_id is None:
         report = None
     else:
-        report = get_report_details(report_id)
-        taste_ids = [ id[0] for id in get_report_taste_ids(report_id) ]
-    colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
+        report = query.get_report_details(report_id)
+        taste_ids = [ id[0] for id in query.get_report_taste_ids(report_id) ]
+    colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
 
 @app.route("/create_symptom_report/<int:report_id>")
 def create_symptom_report(report_id):
     require_login()
-    if report_exists(report_id):
-        report = get_report_details(report_id)
-        report_tastes = get_report_taste_strings(report_id)
-        colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
+    if query.report_exists(report_id):
+        report = query.get_report_details(report_id)
+        report_tastes = query.get_report_taste_strings(report_id)
+        colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
         return render_template("create_symptom_report.html", fetched=report, colors=colors, 
                             tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                             report_tastes=report_tastes, healthvalues=healthvalues)
@@ -91,7 +91,7 @@ def send_symptom_report():
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
     require_login()
-    owner_id = get_report_owner(report_id)
+    owner_id = query.get_report_owner(report_id)
     require_ownership(owner_id)
     return create_report(report_id=report_id)
 
@@ -99,13 +99,13 @@ def edit_report(report_id):
 @app.route("/send_report_edit/<int:report_id>", methods=["POST"])
 def send_report_edit(report_id):
     require_login()
-    owner_id = get_report_owner(report_id)
+    owner_id = query.get_report_owner(report_id)
     require_ownership(owner_id)
 
     category_new, color_new, culinaryvalue_new, blanched_new, tastes_new = get_reportform_contents()
     if not tastes_valid(tastes_new):
             abort(418)
-    category, color, culinaryvalue, blanched, tastes = get_report_raw(report_id)
+    category, color, culinaryvalue, blanched, tastes = query.get_report_raw(report_id)
     if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new and blanched == blanched_new):
         sql = """
             UPDATE reports SET category = ?, color = ?, culinaryvalue = ?, blanched = ?
@@ -152,7 +152,7 @@ def send_report():
 @app.route("/delete_report/<int:report_id>")
 def delete_report(report_id):
     require_login()
-    owner_id = get_report_owner(report_id)
+    owner_id = query.get_report_owner(report_id)
     require_ownership(owner_id)
 
     sql = """
@@ -212,7 +212,7 @@ def create():
     except sqlite3.IntegrityError:
         return "Username already taken"
 
-    user_id = get_uid_from_username(username)
+    user_id = query.get_uid_from_username(username)
     session["username"] = username
     session["user_id"] = user_id
     return redirect("/")
