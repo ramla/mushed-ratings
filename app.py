@@ -177,6 +177,7 @@ def create():
     password  = request.form["password1"]
     password2 = request.form["password2"]
     #TODO: validate input
+    validate_username(username)
     if password != password2:
         return "Passwords do not match"
     password_hash = generate_password_hash(password)
@@ -242,3 +243,11 @@ def get_reportform_contents():
 
 def tastes_valid(tastes):
     return True #TODO
+
+def validate_username(username):
+    allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    if 3 > len(username) > 20:
+        return "username must be between 3 and 20 characters"
+    for char in username:
+        if not char in allowed_username_characters:
+            return f"username may only contain {allowed_username_characters}"
