@@ -4,6 +4,12 @@ import db
 def get_availabe_tastes_count():
     return db.query("SELECT COUNT(id) FROM tastes")[0][0]
 
+def get_valid_taste_ids():
+    result = db.query("SELECT id FROM tastes")
+    id_list = []
+    for row in result:
+        id_list.append(row[0])
+    return id_list
 
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")

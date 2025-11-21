@@ -93,8 +93,7 @@ def send_report_edit(report_id):
     require_ownership(owner_id)
 
     category_new, color_new, culinaryvalue_new, blanched_new, tastes_new = get_reportform_contents()
-    if not tastes_valid(tastes_new):
-            abort(418)
+    validate_reportform_contents(category_new, color_new, culinaryvalue_new, blanched_new, tastes_new)
     category, color, culinaryvalue, blanched, tastes = query.get_report_raw(report_id)
     if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new and blanched == blanched_new):
         sql = """
@@ -121,7 +120,8 @@ def send_report_edit(report_id):
 def send_report():
     require_login()
     category, color, culinaryvalue, blanched, tastes = get_reportform_contents()
-
+    validate_reportform_contents(category, color, culinaryvalue, tastes)
+    
     uid = session["user_id"]
     sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
                 VALUES (?, datetime('now'), ?, ?, ?, ?)"""
@@ -242,7 +242,11 @@ def get_reportform_contents():
     return (category, color, culinaryvalue, blanched, tastes)
 
 def tastes_valid(tastes):
-    return True #TODO
+    valid_ids = query.get_available_taste_ids()
+    for id in tastes:
+        if id not in valid_ids:
+            return f"taste id {id} invalid"
+    return True
 
 def validate_username(username):
     allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -251,3 +255,13 @@ def validate_username(username):
     for char in username:
         if not char in allowed_username_characters:
             return f"username may only contain {allowed_username_characters}"
+
+def validate_reportform_contents(category, color, culinaryvalue, tastes):
+    if not category in range(1,16):
+            abort(418)
+    if not color in range(1,343):
+            abort(418)
+    if not culinaryvalue in range(1,4):
+            abort(418)
+    if not tastes_valid(tastes):
+            abort(418)
