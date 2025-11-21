@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 import config
+from query import get_report_details, get_report_owner, get_report_raw, get_report_strings, get_report_taste_strings, get_report_taste_ids, get_uid_from_username, report_exists
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -65,7 +66,7 @@ def create_report(report_id=None):
         report = None
     else:
         report = get_report_details(report_id)
-        taste_ids = [ id[0] for id in get_report_tastes(report_id) ]
+        taste_ids = [ id[0] for id in get_report_taste_ids(report_id) ]
     colors, tastes, culinaryvalues, categories, healthvalues = get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
@@ -93,6 +94,7 @@ def edit_report(report_id):
     owner_id = get_report_owner(report_id)
     require_ownership(owner_id)
     return create_report(report_id=report_id)
+
 
 @app.route("/send_report_edit/<int:report_id>", methods=["POST"])
 def send_report_edit(report_id):
@@ -235,10 +237,6 @@ def logout():
     session.clear()
     return redirect("/")
 
-def get_uid_from_username(username):
-    sql = "SELECT id FROM users WHERE name = ?"
-    return db.query(sql, [username])[0][0]
-
 def require_login():
     if "user_id" not in session:
         abort(403)
@@ -250,58 +248,6 @@ def require_ownership(owner_id, ):
     if user_id != owner_id:
         print(f"Suspicious activity - require_ownership abort: {user_id} != {owner_id}")
         abort(403)
-
-def get_report_strings():
-    colors         = db.query("SELECT id, name, hex FROM colors")
-    tastes         = db.query("SELECT id, name, description FROM tastes")
-    culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
-    categories     = db.query("SELECT id, name FROM categories")
-    healthvalues   = db.query("SELECT id, name, description FROM healthvalues")
-    return (colors, tastes, culinaryvalues, categories, healthvalues)
-
-def get_report_owner(report_id):
-    param = (report_id, )
-    sql = """ SELECT uid FROM reports WHERE reports.id = ?"""
-    result = db.query(sql, param)
-    if not result:
-        return None
-    return result[0][0]
-
-def get_report_details(report_id):
-    param = (report_id, )
-    report_sql = """SELECT r.*,
-                    u.name AS user_name,
-                    u.id AS user_id,
-                    c.name AS color_name,
-                    c.hex AS color_hex,
-                    cat.name AS category_name,
-                    cv.name AS culinaryvalue_name,
-                    cv.id AS culinaryvalue_id
-                    FROM reports r
-                        JOIN users u ON r.uid = u.id
-                        JOIN colors c ON r.color = c.id
-                        JOIN categories cat ON r.category = cat.id
-                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                    WHERE r.id = ?"""
-    return db.query(report_sql, param)[0]
-
-def get_report_taste_strings(report_id):
-    taste_sql =  """SELECT t.name
-                    FROM tastes t
-                        JOIN report_tastes rt ON t.id = rt.tastes_id
-                        JOIN reports r        ON r.id = rt.report_id
-                    WHERE r.id = ?"""
-    param = (report_id,)
-    return db.query(taste_sql, param)
-
-def get_report_tastes(report_id):
-    taste_sql =  """SELECT t.id
-                    FROM tastes t
-                        JOIN report_tastes rt ON t.id = rt.tastes_id
-                        JOIN reports r        ON r.id = rt.report_id
-                    WHERE r.id = ?"""
-    param = (report_id,)
-    return db.query(taste_sql, param)
 
 def get_reportform_contents():
     tastecount    = db.query("SELECT COUNT(*) FROM tastes")[0][0]
@@ -319,25 +265,5 @@ def get_reportform_contents():
     
     return (category, color, culinaryvalue, blanched, tastes)
 
-def get_report_raw(report_id):
-    param = (report_id, )
-    report_sql = """SELECT r.category, r.color, r.culinaryvalue, r.blanched
-                    FROM reports r
-                        JOIN users u ON r.uid = u.id
-                        JOIN colors c ON r.color = c.id
-                        JOIN categories cat ON r.category = cat.id
-                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                    WHERE r.id = ?"""
-    category, color, culinaryvalue, blanched = db.query(report_sql, param)[0]
-    tastes = get_report_tastes(report_id)
-    return (category, color, culinaryvalue, blanched, tastes)
-
 def tastes_valid(tastes):
     return True #TODO
-
-def report_exists(report_id):
-    param = (report_id, )
-    sql = """SELECT 1 FROM reports
-                WHERE reports.id = ?
-                    AND reports.deleted = 0"""
-    return db.query(sql, param)
