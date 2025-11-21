@@ -245,7 +245,7 @@ def tastes_valid(tastes):
     return True #TODO
 
 def validate_username(username):
-    allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     if 3 > len(username) > 20:
         return "username must be between 3 and 20 characters"
     for char in username:
