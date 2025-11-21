@@ -254,12 +254,12 @@ def get_reportform_contents():
     else:
         blanched = 0
     
-    #TODO: validate input
+    validate_reportform_contents(category, color, culinaryvalue, tastes)
     
     return (category, color, culinaryvalue, blanched, tastes)
 
 def tastes_valid(tastes):
-    valid_ids = query.get_available_taste_ids()
+    valid_ids = query.get_valid_taste_ids()
     for id in tastes:
         if id not in valid_ids:
             return f"taste id {id} invalid"
