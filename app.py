@@ -76,21 +76,37 @@ def create_symptom_report(report_id):
 
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
-    pass
+    require_login()
+    report_id     = request.form.get("report_id")
+    healthvalue   = request.form.get("healthvalue")
+    blanched      = request.form.get("blanched")
+    if blanched:
+        blanched = 1
+    else:
+        blanched = 0
+    print("symptom report POST", report_id, healthvalue, blanched)
+    
+    require_report_ownership(report_id)
+    if not int(healthvalue) in range(1,6):
+        print(f"not {healthvalue} in range(1,6)")
+        if healthvalue == 0:
+            return "symptom report deletion not implemented yet"
+        abort(404)
+    #insert
+    return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
     require_login()
     owner_id = query.get_report_owner(report_id)
-    require_ownership(owner_id)
+    require_report_ownership(owner_id)
     return create_report(report_id=report_id)
 
 
 @app.route("/send_report_edit/<int:report_id>", methods=["POST"])
 def send_report_edit(report_id):
     require_login()
-    owner_id = query.get_report_owner(report_id)
-    require_ownership(owner_id)
+    require_report_ownership(report_id)
 
     category_new, color_new, culinaryvalue_new, blanched_new, tastes_new = get_reportform_contents()
     validate_reportform_contents(category_new, color_new, culinaryvalue_new, blanched_new, tastes_new)
@@ -121,7 +137,7 @@ def send_report():
     require_login()
     category, color, culinaryvalue, blanched, tastes = get_reportform_contents()
     validate_reportform_contents(category, color, culinaryvalue, tastes)
-    
+
     uid = session["user_id"]
     sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
                 VALUES (?, datetime('now'), ?, ?, ?, ?)"""
@@ -143,7 +159,7 @@ def send_report():
 def delete_report(report_id):
     require_login()
     owner_id = query.get_report_owner(report_id)
-    require_ownership(owner_id)
+    require_report_ownership(owner_id)
 
     sql = """
             UPDATE reports SET deleted = 1
@@ -217,7 +233,8 @@ def require_login():
     if "user_id" not in session:
         abort(403)
 
-def require_ownership(owner_id, ):
+def require_report_ownership(report_id):
+    owner_id = query.get_report_owner(report_id)
     if "user_id" not in session:
         abort(403)
     user_id = session["user_id"]
@@ -257,11 +274,11 @@ def validate_username(username):
             return f"username may only contain {allowed_username_characters}"
 
 def validate_reportform_contents(category, color, culinaryvalue, tastes):
-    if not category in range(1,16):
+    if not int(category) in range(1,16):
             abort(418)
-    if not color in range(1,343):
+    if not int(color) in range(1,343):
             abort(418)
-    if not culinaryvalue in range(1,4):
+    if not int(culinaryvalue) in range(1,4):
             abort(418)
     if not tastes_valid(tastes):
             abort(418)
