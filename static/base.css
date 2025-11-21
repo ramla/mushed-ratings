@@ -106,3 +106,10 @@ details[open] summary {
     line-height: 150%;
     text-indent: 2ch;
 }
+.indented {
+    margin-left: 3em;
+}
+.signature {
+    font-style: italic;
+    font-size: 90%;
+}

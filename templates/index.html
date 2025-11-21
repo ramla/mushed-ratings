@@ -4,11 +4,29 @@
   <div class="base-container"><h1>MushEd Ratings</h1>
     <p>Welcome to MushEd, the most trusted Mushroom Edibility Tracker!</p>
     {% if session.user_id %}
-    <p>
+    <p class="indented">
       Logged in as <a href="{{ url_for('view_user', user_id=session.user_id) }}">{{ session.username }}</a>.
     </p> 
-    <p>
+    <p class="indented">
       Not {{session.username}}? <a href="/logout">Logout</a> or <a href="{{ url_for('report_fatality', user_id=session.user_id) }}">report the departed</a>.
+    </p>
+    <p>We're working really hard to implement the following features for your benefit
+      <ul>
+        <li>Credits</li>
+        <li>Credit annullment</li>
+        <li>Symptom report deletion</li>
+        <li>Statistics</li>
+        <li>New activity listing</li>
+        <li>Improved security</li>
+        <li>Better search</li>
+        <li>Fatalities reporting</li>
+      </ul>
+    </p>
+    <p>Keep sampling and stay safe!</p> 
+      <p><span class="indented">Best regards</span>
+      <br><span class="indented signature">Universavorum Incorporated</span>
+      <br><span class="indented signature">Department of Galactic Discovery</span>
+      <br><span class="indented signature">Nutritional Innovations Branch</span>
     </p>
     {% else %}
       <div class="info-expander">
@@ -28,6 +46,7 @@
                       <a href="{{ url_for('register') }}">Create your account now</a> and 
                       <a href="{{ url_for('create_report') }}">report your findings</a> to claim your well earned credits*. 
                       Remember to check back on <a href="{{ url_for('all_reports') }}">what others have tasted</a>!</p>
+                      <p>Pro tip: When eating a mushroom for the first time, it's safer to try it blanched first.</p>
                       <span class="fine-print">* Not yet implemented</span>
                   </div>
           </details>
@@ -47,6 +66,5 @@
     </form>
     <p>...or register <a href="{{ url_for('register') }}">here</a>!</p>
     {% endif %}
-    <p>{{ visits }}</p>
   </div>
 {% endblock %}
