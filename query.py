@@ -84,6 +84,25 @@ def report_exists(report_id):
     return db.query(sql, param)
 
 
+def get_search_results(keywords):
+    keywords = "%" + keywords + "%"
+    sql = """   SELECT r.*,
+                u.name AS user_name, 
+                c.name AS color_name, 
+                cat.name AS category_name, 
+                cv.name AS culinaryvalue_name
+                FROM reports r
+                    JOIN users u ON r.uid = u.id
+                    JOIN colors c ON r.color = c.id
+                    JOIN categories cat ON r.category = cat.id
+                    JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                WHERE u.name LIKE LOWER(?)
+                    OR c.name LIKE LOWER(?)
+                    OR cat.name LIKE LOWER(?)
+                    OR cv.name LIKE LOWER(?);"""
+    return db.query(sql, [keywords, keywords, keywords, keywords])
+
+
 def get_uid_from_username(username):
     sql = "SELECT id FROM users WHERE name = ?"
     return db.query(sql, [username])[0][0]

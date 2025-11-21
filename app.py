@@ -168,22 +168,7 @@ def search():
     keywords = request.args.get("query")
     #TODO: validate input
     #TODO: multiword search how
-    keywords = "%" + keywords + "%"
-    sql = """   SELECT r.*,
-                u.name AS user_name, 
-                c.name AS color_name, 
-                cat.name AS category_name, 
-                cv.name AS culinaryvalue_name
-                FROM reports r
-                    JOIN users u ON r.uid = u.id
-                    JOIN colors c ON r.color = c.id
-                    JOIN categories cat ON r.category = cat.id
-                    JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
-                WHERE u.name LIKE LOWER(?)
-                    OR c.name LIKE LOWER(?)
-                    OR cat.name LIKE LOWER(?)
-                    OR cv.name LIKE LOWER(?);"""
-    result = db.query(sql, [keywords, keywords, keywords, keywords])
+    result = query.get_search_results(keywords)
     return render_template("search.html", data=result)
 
 @app.route("/create", methods=["POST"])
