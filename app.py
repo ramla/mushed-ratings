@@ -87,7 +87,7 @@ def send_symptom_report():
     print("symptom report POST", report_id, healthvalue, blanched)
     
     require_report_ownership(report_id)
-    if not int(healthvalue) in range(1,6):
+    if not healthvalue in [str(i) for i in range(1,6)]:
         print(f"not {healthvalue} in range(1,6)")
         if healthvalue == 0:
             return "symptom report deletion not implemented yet"
