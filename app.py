@@ -25,12 +25,14 @@ def view_report(report_id):
     colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
     report_tastes = query.get_report_taste_strings(report_id)
     fetched       = query.get_report_details(report_id)
-    symptom_reps  = [ row[0] for row in query.get_report_healthvalues(report_id) ]
-    for value in symptom_reps:
-        print(value)
+    symptom_reps  = [ row for row in query.get_report_healthvalues(report_id) ]
+    symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
+                    for healthvalue, count_blanched, count_unblanched in symptom_reps ]
+
     return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
-                           report_tastes=report_tastes, symptom_reports=symptom_reps)
+                           report_tastes=report_tastes, healthvalues=healthvalues, 
+                           symptom_counts=symptom_counts)
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):

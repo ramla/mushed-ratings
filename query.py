@@ -17,7 +17,10 @@ def get_report_strings():
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
     categories     = db.query("SELECT id, name FROM categories")
     healthvalues   = db.query("SELECT id, name, description FROM healthvalues")
-    return (colors, tastes, culinaryvalues, categories, healthvalues)
+    return (colors, tastes, culinaryvalues, categories, 
+            { id: { "name": name,
+                    "description": description } 
+            for id, name, description in healthvalues } )
 
 
 def get_report_owner(report_id):
@@ -45,15 +48,33 @@ def get_report_details(report_id):
                         JOIN categories cat ON r.category = cat.id
                         JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
                     WHERE r.id = ?"""
-    return db.query(report_sql, param)[0]
+    return db.query(report_sql, param)
 
 
 def get_report_healthvalues(report_id):
-    healthvalue_sql = """SELECT healthvalue
-                         FROM symptomreports
-                         WHERE report_id = ? 
-                            AND deleted = 0 """
-    param = (report_id, )
+    healthvalue_sql = """
+    SELECT healthvalue,
+        COUNT(CASE WHEN blanched = 1 THEN 1 END) AS blanched_count,
+        COUNT(CASE WHEN blanched = 0 THEN 1 END) AS unblanched_count
+    FROM symptomreports
+    WHERE report_id = ? 
+        AND deleted = 0 
+        AND healthvalue BETWEEN 0 AND 5
+    GROUP BY healthvalue
+    
+    UNION ALL
+
+    -- Total counts
+    SELECT NULL AS healthvalue,
+        SUM(CASE WHEN blanched = 1 THEN 1 ELSE 0 END) AS blanched_count,
+        SUM(CASE WHEN blanched = 0 THEN 1 ELSE 0 END) AS unblanched_count
+    FROM symptomreports
+    WHERE report_id = ?
+        AND deleted = 0
+        AND healthvalue BETWEEN 0 AND 5
+    ORDER BY healthvalue
+    """
+    param = (report_id, report_id)
     return db.query(healthvalue_sql, param)
 
 
