@@ -44,12 +44,26 @@
                 <td>{{ fetched.culinaryvalue_name }}</td>
             </tr>
             <tr>
-                <td>Edibility</td>
-                <td>{{ fetched.edibility_name }}</td>
+                <td>Edibility (unblanched)</td>
+                <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
+                        {% if count_blanched %}
+                            {% if symptom_counts[0][1] > 0 and hid and count_blanched > 0 %}
+                                {{ healthvalues[hid].name }}: {{ count_blanched / symptom_counts[0][1] * 100 }}%<br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
             </tr>
             <tr>
                 <td>Edibility Blanched</td>
-                <td>{{ fetched.edibility_name }}</td>
+                <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
+                        {% if count_unblanched %}
+                            {% if symptom_counts[0][2] > 0 and hid and count_unblanched > 0 %}
+                                {{ healthvalues[hid].name }}: {{ count_unblanched / symptom_counts[0][2] * 100 }}%<br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
             </tr>
         </tbody>
     </table>
@@ -58,7 +72,7 @@
         <label for="healthvalue"><h3>Healthiness rating:</h3></label>
         <p><select name="healthvalue" id="healthvalue">
             <option value="-1">Select one</option>
-            {% for id,name,description in healthvalues %}
+            {% for id,(name,description) in healthvalues.items() %}
             <option value="{{ id }}"{% if symptom_report %}{% if symptom_report.healthvalue == id %} selected{% endif %}{% endif %}>{{ name }}</option>
             {% endfor %}
         </select></p>

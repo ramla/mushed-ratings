@@ -22,13 +22,14 @@ def view_report(report_id):
     if "user_id" not in session:
         return redirect("/")
 
+
     colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
     report_tastes = query.get_report_taste_strings(report_id)
     fetched       = query.get_report_details(report_id)
     symptom_reps  = [ row for row in query.get_report_healthvalues(report_id) ]
     symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
                     for healthvalue, count_blanched, count_unblanched in symptom_reps ]
-
+    print(healthvalues)
     return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                            report_tastes=report_tastes, healthvalues=healthvalues, 
@@ -62,22 +63,26 @@ def create_report(report_id=None):
     else:
         report = query.get_report_details(report_id)
         taste_ids = [ id[0] for id in query.get_report_taste_ids(report_id) ]
-    colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
+    colors, tastes, culinaryvalues, categories, _ = query.get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
 
 @app.route("/create_symptom_report/<int:report_id>")
 def create_symptom_report(report_id):
     require_login()
-    if query.report_exists(report_id):
-        report = query.get_report_details(report_id)
-        report_tastes = query.get_report_taste_strings(report_id)
-        colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
-        return render_template("create_symptom_report.html", fetched=report, colors=colors, 
-                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
-                            report_tastes=report_tastes, healthvalues=healthvalues)
-    else: 
-        return "no report found with given id"
+    require_report_exists(report_id)
+
+    report = query.get_report_details(report_id)
+    report_tastes = query.get_report_taste_strings(report_id)
+    colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
+    symptom_reps  = [ row for row in query.get_report_healthvalues(report_id) ]
+    symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
+                for healthvalue, count_blanched, count_unblanched in symptom_reps ]
+    print(healthvalues)
+    return render_template("create_symptom_report.html", fetched=report, colors=colors, 
+                        tastes=tastes, culvalues=culinaryvalues, categories=categories, 
+                        report_tastes=report_tastes, healthvalues=healthvalues, 
+                        symptom_counts=symptom_counts)
 
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
@@ -290,3 +295,7 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
     if query.report_exists_with(category=category, color=color, culinaryvalue=culinaryvalue, tastes=tastes):
         #TODO
         pass
+
+def require_report_exists(report_id):
+    if not query.report_exists(report_id):
+        abort(404)
