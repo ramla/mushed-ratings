@@ -17,7 +17,6 @@
                 <th>Category</th>
                 <th>Color</th>
                 <th>Culinary Value</th>
-                <th>Blanched</th>
             </tr>
         </thead>
         <tbody>
@@ -30,7 +29,6 @@
                     <td>deleted</td>
                     <td>-</td>
                     <td>-</td>
-                    <td>-</td>
                 </tr>
                 {% else %}
                 <tr>
@@ -40,7 +38,6 @@
                     <td><a href="{{ url_for('search', query=row.category_name) }}">{{ row.category_name }}</a></td>
                     <td><a href="{{ url_for('search', query=row.color_name) }}">{{ row.color_name }}</a></td>
                     <td><a href="{{ url_for('search', query=row.culinaryvalue_name) }}">{{ row.culinaryvalue_name }}</a></td>
-                    <td>{{ row.blanched }}</td>
                 </tr>
                 {% endif %}
             {% endfor %}

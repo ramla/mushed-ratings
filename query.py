@@ -50,7 +50,7 @@ def get_report_details(report_id):
 
 def get_report_healthvalues(report_id):
     healthvalue_sql = """SELECT healthvalue
-                         FROM symptomreport
+                         FROM symptomreports
                          WHERE report_id = ? 
                             AND deleted = 0 """
     param = (report_id, )
@@ -79,16 +79,16 @@ def get_report_taste_ids(report_id):
 
 def get_report_raw(report_id):
     param = (report_id, )
-    report_sql = """SELECT r.category, r.color, r.culinaryvalue, r.blanched
+    report_sql = """SELECT r.category, r.color, r.culinaryvalue
                     FROM reports r
                         JOIN users u ON r.uid = u.id
                         JOIN colors c ON r.color = c.id
                         JOIN categories cat ON r.category = cat.id
                         JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
                     WHERE r.id = ?"""
-    category, color, culinaryvalue, blanched = db.query(report_sql, param)[0]
+    category, color, culinaryvalue = db.query(report_sql, param)[0]
     tastes = get_report_taste_ids(report_id)
-    return (category, color, culinaryvalue, blanched, tastes)
+    return (category, color, culinaryvalue, tastes)
 
 
 def report_exists(report_id):

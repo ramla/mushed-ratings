@@ -31,18 +31,16 @@
                 <th>Category</th>
                 <th>Color</th>
                 <th>Culinary Value</th>
-                <th>Blanched</th>
             </tr>
         </thead>
         <tbody>
-            {% for id,uid,date,category,color,culinaryvalue,blanched,deleted in data %}
+            {% for id,uid,date,category,color,culinaryvalue,deleted in data %}
             {% if deleted %}
             <tr>
                 <td>{{ id }}</td>
                 <td>{{ uid }}</td>
                 <td>{{ date }}</td>
                 <td>deleted</td>
-                <td>-</td>
                 <td>-</td>
                 <td>-</td>
             </tr>
@@ -54,7 +52,6 @@
                 <td>{{ category }}</td>  <!-- Category -->
                 <td>{{ color }}</td>  <!-- Color -->
                 <td>{{ culinaryvalue }}</td>  <!-- Culinary Value -->
-                <td>{{ blanched }}</td>  <!-- Blanched (Boolean) -->
             </tr>
             {% endif %}
             {% endfor %}

@@ -50,9 +50,6 @@
             <option value="{{ id }}"{% if report %}{% if report.culinaryvalue_id == id %}selected{% endif %}{% endif %}>{{ name }}</option>
             {% endfor %}
         </select>
-        <h3>Pretreatment:</h3>
-        <p><input type="checkbox" id="blanched" name="blanched" value="True" {% if report %}{% if report.blanched %}checked{% endif %}{% endif %}/>
-        <label for="blanched">Blanched before use</label></p>
         <input type="submit" value="Submit">
     </form>
 </div>

@@ -96,10 +96,10 @@ def send_symptom_report():
         if healthvalue == 0:
             return "symptom report deletion not implemented yet"
         abort(418)
-    healthvalue_sql = """   INSERT INTO symptomreport
+    healthvalue_sql = """   INSERT INTO symptomreports
                                 (uid, date, report_id, healthvalue)
-                                VALUES (?, datetime('now'), ?, ?) """
-    params = (user_id, report_id, healthvalue) #blanched
+                                VALUES (?, datetime('now'), ?, ?, ?) """
+    params = (user_id, report_id, healthvalue, blanched)
     db.execute(healthvalue_sql, params)
     return redirect(url_for("view_report", report_id=report_id))
 
@@ -116,15 +116,15 @@ def send_report_edit(report_id):
     require_login()
     require_report_ownership(report_id)
 
-    category_new, color_new, culinaryvalue_new, blanched_new, tastes_new = get_reportform_contents()
-    validate_reportform_contents(category_new, color_new, culinaryvalue_new, blanched_new, tastes_new)
-    category, color, culinaryvalue, blanched, tastes = query.get_report_raw(report_id)
-    if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new and blanched == blanched_new):
+    category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
+    validate_reportform_contents(category_new, color_new, culinaryvalue_new, tastes_new)
+    category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
+    if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new):
         sql = """
-            UPDATE reports SET category = ?, color = ?, culinaryvalue = ?, blanched = ?
+            UPDATE reports SET category = ?, color = ?, culinaryvalue = ?
             WHERE id = ?
         """
-        db.execute(sql, [category_new, color_new, culinaryvalue_new, blanched_new, report_id])
+        db.execute(sql, [category_new, color_new, culinaryvalue_new, report_id])
     if not tastes == tastes_new:
         delete_tastes_sql = """
             DELETE FROM report_tastes
@@ -143,13 +143,13 @@ def send_report_edit(report_id):
 @app.route("/send_report", methods=["POST"])
 def send_report():
     require_login()
-    category, color, culinaryvalue, blanched, tastes = get_reportform_contents()
+    category, color, culinaryvalue, tastes = get_reportform_contents()
     validate_reportform_contents(category, color, culinaryvalue, tastes)
 
     uid = session["user_id"]
-    sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue, blanched) 
-                VALUES (?, datetime('now'), ?, ?, ?, ?)"""
-    params = [uid, category, color, culinaryvalue, blanched]
+    sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue) 
+                VALUES (?, datetime('now'), ?, ?, ?) """
+    params = [uid, category, color, culinaryvalue]
     db.execute(sql, params)
     report_id = db.last_insert_id()
 
@@ -256,15 +256,10 @@ def get_reportform_contents():
     color         = request.form["color"]
     tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]
     culinaryvalue = request.form["culvalue"]
-    blanched      = request.form.get("blanched")
-    if blanched:
-        blanched = 1
-    else:
-        blanched = 0
     
     validate_reportform_contents(category, color, culinaryvalue, tastes)
     
-    return (category, color, culinaryvalue, blanched, tastes)
+    return (category, color, culinaryvalue, tastes)
 
 def tastes_valid(tastes):
     valid_ids = query.get_valid_taste_ids()
