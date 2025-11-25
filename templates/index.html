@@ -6,9 +6,7 @@
     {% if session.user_id %}
     <p class="indented">
       Logged in as <a href="{{ url_for('view_user', user_id=session.user_id) }}">{{ session.username }}</a>.
-    </p> 
-    <p class="indented">
-      Not {{session.username}}? <a href="/logout">Logout</a> or <a href="{{ url_for('report_fatality', user_id=session.user_id) }}">report the departed</a>.
+  <br><span style="font-size: 80%">Not {{session.username}}? <a href="/logout">Logout</a> or <a href="{{ url_for('report_fatality', user_id=session.user_id) }}">report the departed</a>.</span>
     </p>
     <p>We're working really hard to implement the following features for your benefit
       <ul>
