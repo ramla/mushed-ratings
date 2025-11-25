@@ -97,7 +97,7 @@ def send_symptom_report():
             return "symptom report deletion not implemented yet"
         abort(418)
     healthvalue_sql = """   INSERT INTO symptomreports
-                                (uid, date, report_id, healthvalue)
+                                (uid, date, report_id, healthvalue, blanched)
                                 VALUES (?, datetime('now'), ?, ?, ?) """
     params = (user_id, report_id, healthvalue, blanched)
     db.execute(healthvalue_sql, params)
