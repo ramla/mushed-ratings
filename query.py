@@ -48,6 +48,15 @@ def get_report_details(report_id):
     return db.query(report_sql, param)[0]
 
 
+def get_report_healthvalues(report_id):
+    healthvalue_sql = """SELECT healthvalue
+                         FROM symptomreport
+                         WHERE report_id = ? 
+                            AND deleted = 0 """
+    param = (report_id, )
+    return db.query(healthvalue_sql, param)
+
+
 def get_report_taste_strings(report_id):
     taste_sql =  """SELECT t.name
                     FROM tastes t

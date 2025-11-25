@@ -45,7 +45,7 @@
             </tr>
             <tr>
                 <td>Edibility</td>
-                <td>{{ fetched.edibility_name }}</td>
+                <td>{% for value in symptom_reports %}{{ value }} {% endfor %}</td>
             </tr>
             <tr>
                 <td>Edibility Blanched</td>

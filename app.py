@@ -25,9 +25,12 @@ def view_report(report_id):
     colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
     report_tastes = query.get_report_taste_strings(report_id)
     fetched       = query.get_report_details(report_id)
+    symptom_reps  = [ row[0] for row in query.get_report_healthvalues(report_id) ]
+    for value in symptom_reps:
+        print(value)
     return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
-                           report_tastes=report_tastes)
+                           report_tastes=report_tastes, symptom_reports=symptom_reps)
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):
@@ -77,6 +80,7 @@ def create_symptom_report(report_id):
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
     require_login()
+    user_id       = session["user_id"]
     report_id     = request.form.get("report_id")
     healthvalue   = request.form.get("healthvalue")
     blanched      = request.form.get("blanched")
@@ -91,8 +95,12 @@ def send_symptom_report():
         print(f"not {healthvalue} in range(1,6)")
         if healthvalue == 0:
             return "symptom report deletion not implemented yet"
-        abort(404)
-    #insert
+        abort(418)
+    healthvalue_sql = """   INSERT INTO symptomreport
+                                (uid, date, report_id, healthvalue)
+                                VALUES (?, datetime('now'), ?, ?) """
+    params = (user_id, report_id, healthvalue) #blanched
+    db.execute(healthvalue_sql, params)
     return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/edit_report/<int:report_id>")
