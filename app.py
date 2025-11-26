@@ -4,6 +4,7 @@ from flask import redirect, render_template, request, session, abort
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 import config
+import crud
 import query
 
 app = Flask(__name__)
@@ -101,11 +102,9 @@ def send_symptom_report():
         if healthvalue == 0:
             return "symptom report deletion not implemented yet"
         abort(418)
-    healthvalue_sql = """   INSERT INTO symptomreports
-                                (uid, date, report_id, healthvalue, blanched)
-                                VALUES (?, datetime('now'), ?, ?, ?) """
-    params = (user_id, report_id, healthvalue, blanched)
-    db.execute(healthvalue_sql, params)
+
+    crud.insert_symptom_report(user_id, report_id, healthvalue, blanched)
+
     return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/edit_report/<int:report_id>")
@@ -124,24 +123,12 @@ def send_report_edit(report_id):
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
     validate_reportform_contents(category_new, color_new, culinaryvalue_new, tastes_new)
     category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
+
     if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new):
-        sql = """
-            UPDATE reports SET category = ?, color = ?, culinaryvalue = ?
-            WHERE id = ?
-        """
-        db.execute(sql, [category_new, color_new, culinaryvalue_new, report_id])
+        crud.update_report(category_new, color_new, culinaryvalue_new, report_id)
     if not tastes == tastes_new:
-        delete_tastes_sql = """
-            DELETE FROM report_tastes
-            WHERE report_id = ?
-        """
-        db.execute(delete_tastes_sql, [report_id, ])
-            
-        taste_sql = "INSERT INTO report_tastes (report_id, tastes_id) VALUES (?, ?);\n"
-        for taste in tastes_new:
-            params = [report_id, taste]
-            db.execute(taste_sql, params)
-    
+        crud.update_report_tastes(report_id, tastes_new)
+
     return redirect(url_for("view_report", report_id=report_id))
 
 
@@ -152,19 +139,10 @@ def send_report():
     validate_reportform_contents(category, color, culinaryvalue, tastes)
 
     uid = session["user_id"]
-    sql = """   INSERT INTO reports (uid, date, category, color, culinaryvalue) 
-                VALUES (?, datetime('now'), ?, ?, ?) """
-    params = [uid, category, color, culinaryvalue]
-    db.execute(sql, params)
+    crud.insert_report(uid, category, color, culinaryvalue)
+    
     report_id = db.last_insert_id()
-
-    sql = "INSERT INTO report_tastes (report_id, tastes_id) VALUES (?, ?)"
-    tastes_inserted = 0
-    for i in tastes:
-        tastes_inserted += 1
-        db.execute(sql, [report_id, i])
-    if tastes_inserted == 0:
-        db.execute(sql, [report_id, 1]) # mild
+    crud.insert_tastes(report_id, tastes)
 
     return redirect(url_for("view_report", report_id=report_id))
 
@@ -174,13 +152,11 @@ def delete_report(report_id):
     owner_id = query.get_report_owner(report_id)
     require_report_ownership(owner_id)
 
-    sql = """
-            UPDATE reports SET deleted = 1
-            WHERE id = ?
-            """
-    db.execute(sql, [report_id, ])
+    crud.set_report_deleted(report_id)
+
     return redirect(url_for("view_report", report_id=report_id))
 
+#TODO: make this obsolete
 @app.route("/all_reports")
 def all_reports():
     sql = "SELECT * FROM reports"
@@ -211,16 +187,12 @@ def create():
         return "Passwords do not match"
     password_hash = generate_password_hash(password)
 
-    try:
-        sql = "INSERT INTO users (name, auth) VALUES (?, ?)"
-        db.execute(sql, [username, password_hash])
-    except sqlite3.IntegrityError:
-        return "Username already taken"
+    crud.create_user(username, password_hash)
 
     user_id = query.get_uid_from_username(username)
     session["username"] = username
     session["user_id"] = user_id
-    timestamp_login(user_id)
+    crud.timestamp_login(user_id)
     return redirect("/")
 
 @app.route("/login", methods=["POST"])
@@ -228,13 +200,13 @@ def login():
     username = request.form["username"]
     password = request.form["password"]
     redir    = request.form["redirect"]
-    sql = "SELECT auth, id FROM users WHERE name = ?"
-    password_hash, user_id = db.query(sql, [username])[0]
+    
+    password_hash, user_id = query.get_auth(username)
 
     if check_password_hash(password_hash, password):
         session["user_id"] = user_id
         session["username"] = username
-        timestamp_login(user_id)
+        crud.timestamp_login(user_id)
         return redirect(redir)
     else:
         return "Wrong username or password"
@@ -299,10 +271,3 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
 def require_report_exists(report_id):
     if not query.report_exists(report_id):
         abort(404)
-
-def timestamp_login(user_id):
-    sql = """   UPDATE users
-                SET lastlogon = datetime('now')
-                WHERE id = ? """
-    param = (user_id, )
-    db.execute(sql, param)

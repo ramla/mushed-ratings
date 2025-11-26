@@ -1,6 +1,14 @@
 import db
 
 
+def get_auth(username):
+    sql = """   SELECT auth, id 
+                FROM users 
+                WHERE name = ?
+            """
+    password_hash, user_id = db.query(sql, [username])[0]
+    return password_hash, user_id
+
 def get_availabe_tastes_count():
     return db.query("SELECT COUNT(id) FROM tastes")[0][0]
 
