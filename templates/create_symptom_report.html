@@ -11,6 +11,8 @@
 <div class="base-container">
 {% if fetched.deleted %}
 <h2>Report deleted by user</h2>
+{% elif symptom_report %}
+<h2>Edit symptom report for</h2>
 {% else %}
 <h2>Create symptom report for</h2>
     <table>
@@ -73,14 +75,30 @@
         <label for="healthvalue"><h3>Healthiness rating:</h3></label>
         <p><select name="healthvalue" id="healthvalue">
             <option value="-1">Select one</option>
-            {% for id,(name,description) in healthvalues.items() %}
-            <option value="{{ id }}"{% if symptom_report %}{% if symptom_report.healthvalue == id %} selected{% endif %}{% endif %}>{{ name }}</option>
+            {% for id,value in healthvalues.items() %}
+            <option value="{{ id }}"
+                {% if symptom_report %}
+                    {% if symptom_report.healthvalue == id %} selected
+                {% endif %}{% endif %}>
+                {{ value.name }}</option>
             {% endfor %}
         </select></p>
         <h3>Confirm pretreatment:</h3>
-        <p><input type="checkbox" id="blanched" name="blanched" value="True" {% if report %}{% if report.blanched %}checked{% endif %}{% endif %}/>
-        <label for="blanched">Blanched before use</label></p>
-        <input type="submit" value="Submit">
+        <p><label>
+                <input type="radio" id="unblanched" name="blanched" value="0" 
+                    {% if symptom_report %}
+                        {% if symptom_report.blanched == 0 %}checked
+                    {% endif %}{% endif %}/>
+                Unblanched
+        </label><br>
+            <label>
+                <input type="radio" id="blanched" name="blanched" value="1" 
+                    {% if symptom_report %}
+                        {% if symptom_report.blanched == 1 %}checked
+                    {% endif %}{% endif %}/>
+                Blanched
+            </label></p>
+        <p><input type="submit" value="Submit"></p>
     </form>
 {% endif %}
 </div>    
