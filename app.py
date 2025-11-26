@@ -29,7 +29,7 @@ def view_report(report_id):
     symptom_reps  = [ row for row in query.get_report_healthvalues(report_id) ]
     symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
                     for healthvalue, count_blanched, count_unblanched in symptom_reps ]
-    print(healthvalues)
+    
     return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                            report_tastes=report_tastes, healthvalues=healthvalues, 
@@ -78,7 +78,7 @@ def create_symptom_report(report_id):
     symptom_reps  = [ row for row in query.get_report_healthvalues(report_id) ]
     symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
                 for healthvalue, count_blanched, count_unblanched in symptom_reps ]
-    print(healthvalues)
+
     return render_template("create_symptom_report.html", fetched=report, colors=colors, 
                         tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                         report_tastes=report_tastes, healthvalues=healthvalues, 
@@ -95,11 +95,9 @@ def send_symptom_report():
         blanched = 1
     else:
         blanched = 0
-    print("symptom report POST", report_id, healthvalue, blanched)
     
     require_report_ownership(report_id)
     if not healthvalue in [str(i) for i in range(1,6)]:
-        print(f"not {healthvalue} in range(1,6)")
         if healthvalue == 0:
             return "symptom report deletion not implemented yet"
         abort(418)
