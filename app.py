@@ -6,6 +6,7 @@ import db
 import config
 import crud
 import query
+import secrets
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
@@ -88,6 +89,7 @@ def create_symptom_report(report_id):
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
     require_login()
+    check_csrf()
     user_id       = session["user_id"]
     report_id     = request.form.get("report_id")
     healthvalue   = request.form.get("healthvalue")
@@ -118,6 +120,9 @@ def edit_report(report_id):
 @app.route("/send_report_edit/<int:report_id>", methods=["POST"])
 def send_report_edit(report_id):
     require_login()
+    check_csrf()
+    if not query.report_exists(report_id):
+        abort(404)
     require_report_ownership(report_id)
 
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
@@ -135,6 +140,7 @@ def send_report_edit(report_id):
 @app.route("/send_report", methods=["POST"])
 def send_report():
     require_login()
+    check_csrf()
     category, color, culinaryvalue, tastes = get_reportform_contents()
     validate_reportform_contents(category, color, culinaryvalue, tastes)
 
@@ -190,6 +196,7 @@ def create():
     crud.create_user(username, password_hash)
 
     user_id = query.get_uid_from_username(username)
+    session["csrf_token"] = secrets.token_hex(16)
     session["username"] = username
     session["user_id"] = user_id
     crud.timestamp_login(user_id)
@@ -204,6 +211,7 @@ def login():
     password_hash, user_id = query.get_auth(username)
 
     if check_password_hash(password_hash, password):
+        session["csrf_token"] = secrets.token_hex(16)
         session["user_id"] = user_id
         session["username"] = username
         crud.timestamp_login(user_id)
@@ -271,3 +279,7 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
 def require_report_exists(report_id):
     if not query.report_exists(report_id):
         abort(404)
+
+def check_csrf():
+    if request.form["csrf_token"] != session["csrf_token"]:
+        abort(403)
