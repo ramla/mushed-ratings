@@ -222,6 +222,7 @@ def create():
     user_id = query.get_uid_from_username(username)
     session["username"] = username
     session["user_id"] = user_id
+    timestamp_login(user_id)
     return redirect("/")
 
 @app.route("/login", methods=["POST"])
@@ -235,6 +236,7 @@ def login():
     if check_password_hash(password_hash, password):
         session["user_id"] = user_id
         session["username"] = username
+        timestamp_login(user_id)
         return redirect(redir)
     else:
         return "Wrong username or password"
@@ -299,3 +301,10 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
 def require_report_exists(report_id):
     if not query.report_exists(report_id):
         abort(404)
+
+def timestamp_login(user_id):
+    sql = """   UPDATE users
+                SET lastlogon = datetime('now')
+                WHERE id = ? """
+    param = (user_id, )
+    db.execute(sql, param)
