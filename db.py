@@ -1,8 +1,24 @@
 import sqlite3
 from flask import g
+from pathlib import Path
 
 def get_connection():
+    create_new = False
+    dbfile = Path("database.db")
+    if not dbfile.is_file():
+        create_new = True
     con = sqlite3.connect("database.db")
+    if create_new:
+        with open("schema.sql", "r") as schema_file:
+            schema = schema_file.read()
+            cursor = con.cursor()
+            cursor.executescript(schema)
+            con.commit()
+        with open("init.sql", "r") as init_file:
+            init_db = init_file.read()
+            cursor = con.cursor()
+            cursor.executescript(init_db)
+            con.commit()
     con.execute("PRAGMA foreign_keys = ON")
     con.row_factory = sqlite3.Row
     return con

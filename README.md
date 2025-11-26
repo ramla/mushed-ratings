@@ -18,13 +18,6 @@ Install `flask`-library:
 $ pip install flask
 ```
 
-Initialise database:
-
-```
-$ sqlite3 database.db < schema.sql
-$ sqlite3 database.db < init.sql
-```
-
 Create secret key:
 ```
 python3 make_secret.py
@@ -36,4 +29,4 @@ Start server:
 $ flask run
 ```
 
-You should now be able to view app at https://localhost:5000/
+You should now be able to view the app at https://localhost:5000/
