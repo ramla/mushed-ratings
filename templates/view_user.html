@@ -30,7 +30,21 @@
             </tr>
             <tr>
                 <td>Reported samplings</td>
-                <td>{{ reports }} <span class="note"><a href="{{ url_for('search', query=search_query) }}">show reports</a></span></td>
+                <td>{% if reports > 0 %}
+                    {% for i in range(reports) %}
+                        {% if i < 10 %}
+                            <a href="{{ url_for('view_report', report_id=i+1) }}">Report {{ i+1 }}</a><br>
+                        {% endif %}
+                        {% if i == 9 %}
+                            <span class="note">
+                                <a href="{{ url_for('search', query=search_query) }}">show all {{ reports }} reports</a>
+                            </span>
+                        {% endif %}
+                    {% endfor %}
+                    {% else %}
+                        None
+                    {% endif %}
+                </td>
             </tr>
         </tbody>
     </table>
