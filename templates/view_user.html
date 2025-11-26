@@ -30,14 +30,14 @@
             </tr>
             <tr>
                 <td>Reported samplings</td>
-                <td>{% if reports > 0 %}
-                    {% for i in range(reports) %}
+                <td>{% if reports|length > 0 %}
+                    {% for i in range(reports|length) %}
                         {% if i < 10 %}
-                            <a href="{{ url_for('view_report', report_id=i+1) }}">Report {{ i+1 }}</a><br>
+                            <a href="{{ url_for('view_report', report_id=reports[i].id) }}">Report {{ reports[i].id }}</a><br>
                         {% endif %}
                         {% if i == 9 %}
                             <span class="note">
-                                <a href="{{ url_for('search', query=search_query) }}">show all {{ reports }} reports</a>
+                                <a href="{{ url_for('search', query=user.name) }}">show all {{ reports|length }} reports</a>
                             </span>
                         {% endif %}
                     {% endfor %}
@@ -45,6 +45,20 @@
                         None
                     {% endif %}
                 </td>
+            </tr>
+            <tr>
+                <td>Latest symptoms:</td>
+                <td>{% if symptom_reports|length > 0 %}
+                    {% for i in range(symptom_reports|length) %}
+                        {% if i < 10 %}
+                            <a href="{{ url_for('view_report', report_id=symptom_reports[i].report_id) }}">Report {{ symptom_reports[i].report_id }}</a>: {{ symptom_reports[i].name }}
+                            <br>{{ symptom_reports[i].date }}, {% if symptom_reports[i].blanched == 1 %}blanched{% else %}unblanched<br>
+                        {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    {% else %}
+                        None
+                    {% endif %}</td>
             </tr>
         </tbody>
     </table>

@@ -197,3 +197,31 @@ def get_user_report_count(user_id):
                                     AND reports.deleted = 0
     """
     return db.query(sql_user_report_count, param)[0][0]
+
+
+def get_user_reports(user_id):
+    sql = """   SELECT r.id, r.date,
+                c.name AS color_name,
+                cat.name AS category_name,
+                cv.name AS culinaryvalue_name
+                FROM reports r
+                    JOIN users u ON r.uid = u.id
+                    JOIN colors c ON r.color = c.id
+                    JOIN categories cat ON r.category = cat.id
+                    JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                WHERE u.id = ?
+            """
+    param = (user_id, )
+    return db.query(sql, param)
+
+
+def get_user_symptom_reports(user_id):
+    sql = """   SELECT sr.id, sr.report_id, sr.date, sr.healthvalue, sr.blanched,
+                        hv.name
+                FROM symptomreports AS sr
+                    JOIN healthvalues hv ON sr.healthvalue = hv.id
+                WHERE sr.uid = ?
+                GROUP BY sr.report_id
+            """
+    param = (user_id, )
+    return db.query(sql, param)

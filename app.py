@@ -47,14 +47,18 @@ def view_user(user_id):
     user_data = query.get_user_data(user_id)
     if not user_data:
         abort(404)
+    user_reports = query.get_user_reports(user_id)
+    user_symptom_reports = query.get_user_symptom_reports(user_id)
+
+    
 
     user_data = dict(user_data[0])
     if not user_data["lastlogon"]:
         user_data["lastlogon"] = "Never"
 
-    user_report_count = query.get_user_report_count(user_id)
+    #user_report_count = query.get_user_report_count(user_id)
 
-    return render_template("view_user.html", user=user_data, reports=user_report_count)
+    return render_template("view_user.html", user=user_data, reports=user_reports, symptom_reports=user_symptom_reports)
 
 #TODO: potential DoS surface for registered users
 @app.route("/create_report/")
