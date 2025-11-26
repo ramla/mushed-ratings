@@ -6,7 +6,6 @@ DELETE FROM colors;
 DELETE FROM visits;
 DELETE FROM users;
 DELETE FROM reports;
-DELETE FROM mushrooms;
 DELETE FROM report_tastes;
 DELETE FROM comments;
 
