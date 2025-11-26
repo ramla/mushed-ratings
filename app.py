@@ -31,6 +31,9 @@ def view_report(report_id):
     symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
                     for healthvalue, count_blanched, count_unblanched in symptom_reps ]
     
+    taste_ids = [taste[0] for taste in report_tastes]
+    query.report_exists_with(fetched["category"],fetched["color"],fetched["culinaryvalue_id"],taste_ids)
+    
     return render_template("view_report.html", fetched=fetched, colors=colors, 
                            tastes=tastes, culvalues=culinaryvalues, categories=categories, 
                            report_tastes=report_tastes, healthvalues=healthvalues, 
@@ -63,7 +66,7 @@ def create_report(report_id=None):
         report = None
     else:
         report = query.get_report_details(report_id)
-        taste_ids = [ id[0] for id in query.get_report_taste_ids(report_id) ]
+        taste_ids = [ id["id"] for id in query.get_report_taste_ids(report_id) ]
     colors, tastes, culinaryvalues, categories, _ = query.get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes, 
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
@@ -141,8 +144,10 @@ def send_report():
     require_login()
     check_csrf()
     category, color, culinaryvalue, tastes = get_reportform_contents()
-    validate_reportform_contents(category, color, culinaryvalue, tastes)
-
+    identical_report = validate_reportform_contents(category, color, culinaryvalue, tastes)
+    if identical_report:
+        return identical_report
+    
     uid = session["user_id"]
     crud.insert_report(uid, category, color, culinaryvalue)
     
@@ -238,10 +243,10 @@ def require_report_ownership(report_id):
 
 def get_reportform_contents():
     tastecount    = query.get_availabe_tastes_count()
-    category      = request.form["category"]
-    color         = request.form["color"]
+    category      = request.form.get("category")
+    color         = request.form.get("color")
     tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]
-    culinaryvalue = request.form["culvalue"]
+    culinaryvalue = request.form.get("culvalue")
     
     validate_reportform_contents(category, color, culinaryvalue, tastes)
     
@@ -264,16 +269,17 @@ def validate_username(username):
 
 def validate_reportform_contents(category, color, culinaryvalue, tastes):
     if not category in [str(i) for i in range(1,16)]:
-            abort(418)
+        abort(418)
     if not color in [str(i) for i in range(1,343)]:
-            abort(418)
+        abort(418)
     if not culinaryvalue in [str(i) for i in range(1,4)]:
-            abort(418)
+        abort(418)
     if not tastes_valid(tastes):
-            abort(418)
-    if query.report_exists_with(category=category, color=color, culinaryvalue=culinaryvalue, tastes=tastes):
-        #TODO
-        pass
+        abort(418)
+    identical_report = query.report_exists_with(category=category, color=color, culinaryvalue=culinaryvalue, taste_ids=tastes)
+    if not identical_report == None:
+        return f"identical report already exists: Report {identical_report}"
+    return None
 
 def require_report_exists(report_id):
     if not query.report_exists(report_id):

@@ -87,7 +87,7 @@ def get_report_healthvalues(report_id):
 
 
 def get_report_taste_strings(report_id):
-    taste_sql =  """SELECT t.name
+    taste_sql =  """SELECT t.id, t.name
                     FROM tastes t
                         JOIN report_tastes rt ON t.id = rt.tastes_id
                         JOIN reports r        ON r.id = rt.report_id
@@ -128,10 +128,33 @@ def report_exists(report_id):
     return db.query(sql, param)
 
 
-def report_exists_with(category, color, culinaryvalue, tastes):
-    #TODO
-    pass
-
+def report_exists_with(category, color, culinaryvalue, taste_ids):
+    sql = """   SELECT id
+                    FROM reports
+                WHERE category = ?
+                    AND color = ?
+                    AND culinaryvalue = ?
+            """
+    params = (category, color, culinaryvalue)
+    result = db.query(sql, params)
+    
+    if len(result) == 0 or taste_ids == []:
+        return None
+    
+    report_id = result[0][0]
+    sql = """   SELECT 1
+                    FROM report_tastes
+                WHERE report_id = ?
+                    AND 
+                        (tastes_id = ?
+            """
+    for _ in range(1, len(taste_ids)):
+        sql += "\n OR tastes_id = ?"
+    sql += ")"
+    matches = db.query(sql, [report_id] + taste_ids)
+    if len(matches) == len(taste_ids):
+        return report_id
+    return None
 
 def get_search_results(keywords):
     keywords = "%" + keywords + "%"
