@@ -3,19 +3,6 @@ CREATE TABLE visits (
   visited_at TEXT
 );
 
-CREATE TABLE mushrooms (
-  id INTEGER PRIMARY KEY,
-  name TEXT UNIQUE,
-  culinaryvalue INTEGER,
-  healthvalue INTEGER,
-  color INTEGER,
-  category INTEGER,
-  FOREIGN KEY(culinaryvalue) REFERENCES culinaryvalues(id),
-  FOREIGN KEY(healthvalue) REFERENCES healthvalues(id),
-  FOREIGN KEY(color) REFERENCES colors(id),
-  FOREIGN KEY(category) REFERENCES categories(id)
-);
-
 CREATE TABLE users (
   id INTEGER PRIMARY KEY,
   name TEXT UNIQUE,
