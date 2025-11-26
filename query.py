@@ -42,7 +42,7 @@ def get_report_owner(report_id):
 
 def get_report_details(report_id):
     param = (report_id, )
-    report_sql = """SELECT r.*,
+    report_sql = """SELECT r.id, r.date, r.category, r.color, r.deleted,
                     u.name AS user_name,
                     u.id AS user_id,
                     c.name AS color_name,
@@ -135,7 +135,7 @@ def report_exists_with(category, color, culinaryvalue, tastes):
 
 def get_search_results(keywords):
     keywords = "%" + keywords + "%"
-    sql = """   SELECT r.*,
+    sql = """   SELECT r.id, r.date, r.uid,
                 u.name AS user_name, 
                 c.name AS color_name, 
                 cat.name AS category_name, 
@@ -148,8 +148,10 @@ def get_search_results(keywords):
                 WHERE u.name LIKE LOWER(?)
                     OR c.name LIKE LOWER(?)
                     OR cat.name LIKE LOWER(?)
-                    OR cv.name LIKE LOWER(?);"""
-    return db.query(sql, [keywords, keywords, keywords, keywords])
+                    OR cv.name LIKE LOWER(?)
+                    OR r.date LIKE LOWER(?)
+            """
+    return db.query(sql, [keywords, keywords, keywords, keywords, keywords])
 
 
 def get_uid_from_username(username):
@@ -167,7 +169,8 @@ def get_user_data(user_id):
 
 def get_user_report_count(user_id):
     param = (user_id, )
-    sql_user_report_count = """ SELECT COUNT(*) FROM reports
+    sql_user_report_count = """ SELECT COUNT(id) FROM reports
                                 WHERE reports.uid = ?
+                                    AND reports.deleted = 0
     """
     return db.query(sql_user_report_count, param)[0][0]
