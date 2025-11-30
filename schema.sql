@@ -31,8 +31,9 @@ CREATE TABLE symptomreports (
   date DATE,
   report_id INTEGER,
   healthvalue INTEGER,
-  blanched INTEGER DEFAULT 0,
+  blanched INTEGER,
   deleted INTEGER DEFAULT 0,
+  rewarded INTEGER,
   FOREIGN KEY(report_id) REFERENCES reports(id),
   FOREIGN KEY(healthvalue) REFERENCES healthvalues(id)
 );

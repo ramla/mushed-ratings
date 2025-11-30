@@ -9,6 +9,11 @@ import secrets
 
 app = Flask(__name__)
 app.secret_key = config.secret_key
+REPORT_REWARD       = 15
+SYMPTOM_REWARD      = 10
+SYMPTOM_REWARD_MIN  = 2
+SYMPTOM_REWARD_DIMINISHING_MULTIPLIER = 1
+
 
 @app.route("/")
 def index():
@@ -105,13 +110,16 @@ def send_symptom_report():
     else:
         blanched = 0
     
-    require_report_ownership(report_id)
     if not healthvalue in [str(i) for i in range(1,6)]:
         if healthvalue == 0:
             return "symptom report deletion not implemented yet"
         abort(418)
+    
+    n_symptom_reports = query.get_n_symptom_reports_for(report_id)
+    reward = max(SYMPTOM_REWARD_MIN, SYMPTOM_REWARD - int((SYMPTOM_REWARD_DIMINISHING_MULTIPLIER * n_symptom_reports)))
+    crud.insert_symptom_report(user_id, report_id, healthvalue, blanched, reward)
 
-    crud.insert_symptom_report(user_id, report_id, healthvalue, blanched)
+    crud.update_user_credits(user_id, reward)
 
     return redirect(url_for("view_report", report_id=report_id))
 
@@ -132,14 +140,16 @@ def send_report_edit(report_id):
     require_report_ownership(report_id)
 
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
-    validate_reportform_contents(category_new, color_new, culinaryvalue_new, tastes_new)
+    identical_report = validate_reportform_contents(category_new, color_new, culinaryvalue_new, tastes_new)
+    #TODO: Annul credits and delete if edited undeleted mushroom exists
+    
     category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
 
     if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new):
         crud.update_report(category_new, color_new, culinaryvalue_new, report_id)
     if not tastes == tastes_new:
         crud.update_report_tastes(report_id, tastes_new)
-
+    
     return redirect(url_for("view_report", report_id=report_id))
 
 
@@ -158,6 +168,8 @@ def send_report():
     report_id = db.last_insert_id()
     crud.insert_tastes(report_id, tastes)
 
+    crud.update_user_credits(uid, REPORT_REWARD)
+
     return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/delete_report/<int:report_id>")
@@ -167,6 +179,8 @@ def delete_report(report_id):
     require_report_ownership(owner_id)
 
     crud.set_report_deleted(report_id)
+
+    crud.update_user_credits(owner_id, -REPORT_REWARD)
 
     return redirect(url_for("view_report", report_id=report_id))
 

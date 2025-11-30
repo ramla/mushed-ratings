@@ -156,6 +156,16 @@ def report_exists_with(category, color, culinaryvalue, taste_ids):
         return report_id
     return None
 
+
+def get_n_symptom_reports_for(report_id):
+    sql = """   SELECT COUNT(1)
+                    FROM symptomreports sr
+                WHERE sr.report_id = ?
+    """
+    param = (report_id, )
+    return db.query(sql, param)[0][0]
+
+
 def get_search_results(keywords):
     keywords = "%" + keywords + "%"
     sql = """   SELECT r.id, r.date, r.uid,

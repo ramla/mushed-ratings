@@ -35,12 +35,12 @@ def insert_tastes(report_id, tastes):
         db.execute(sql, [report_id, 1]) # mild
 
 
-def insert_symptom_report(user_id, report_id, healthvalue, blanched):
+def insert_symptom_report(user_id, report_id, healthvalue, blanched, reward):
     sql = """   INSERT INTO symptomreports
-                    (uid, date, report_id, healthvalue, blanched)
-                    VALUES (?, datetime('now'), ?, ?, ?) 
+                    (uid, date, report_id, healthvalue, blanched, rewarded)
+                    VALUES (?, datetime('now'), ?, ?, ?, ?) 
             """
-    params = (user_id, report_id, healthvalue, blanched)
+    params = (user_id, report_id, healthvalue, blanched, reward)
     db.execute(sql, params)
 
 
@@ -60,6 +60,13 @@ def timestamp_login(user_id):
     param = (user_id, )
     db.execute(sql, param)
 
+def update_user_credits(user_id, credits):
+    sql = """   UPDATE users
+                    SET credits = credits + ?
+                WHERE users.id = ?
+                """
+    params = (credits, user_id)
+    db.execute(sql, params)
 
 def update_report(category, color, culinaryvalue, report_id):
     sql = """   UPDATE reports 
