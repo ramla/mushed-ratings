@@ -1,7 +1,8 @@
 :root {
   --color-primary: #7590fd;
   --color-secondary: #a9b9e9;
-  --color-accent: #eeee4a;
+  --color-accent: #ee784a;
+  --color-light-accent: #b3e7f0;
   --color-background: #181818;
   --color-altbackground: #282828;
   --color-text: #eeeeee;
@@ -112,4 +113,11 @@ details[open] summary {
 .signature {
     font-style: italic;
     font-size: 90%;
+}
+.flash {
+    font-weight: bold;
+    color: var(--color-light-accent);
+}
+.error {
+    color: var(--color-accent);
 }

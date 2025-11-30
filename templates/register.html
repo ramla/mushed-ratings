@@ -3,11 +3,11 @@
 {% block title %}Sign up - {% endblock %}
 
 {% block content %}
-<div class="base-container"><form action="{{ url_for('create') }}" method="post">
+<div class="base-container"><form action="{{ url_for('register') }}" method="post">
   <h1>Sign up for MushEd</h1>
     <p>
       Username: <br />
-      <input type="text" name="username" />
+      <input type="text" name="username" value="{{ filled.username }}" maxlength="20"/>
     </p>
     <p>
       Password: <br />
@@ -17,6 +17,11 @@
       Re-enter password: <br />
       <input type="password" name="password2" />
     </p>
-    <input type="submit" value="Create account" />
+    <p>
+      <input type="submit" value="Create account" />
+    </p>
+    {% for message in get_flashed_messages() %}
+    <p class="flash error">{{ message }}</p>
+    {% endfor %}
   </form></div>
 {% endblock %}

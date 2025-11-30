@@ -1,5 +1,5 @@
 from flask import Flask, url_for
-from flask import redirect, render_template, request, session, abort
+from flask import redirect, render_template, request, session, abort, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 import db
 import config
@@ -13,15 +13,41 @@ REPORT_REWARD       = 15
 SYMPTOM_REWARD      = 10
 SYMPTOM_REWARD_MIN  = 2
 SYMPTOM_REWARD_DIMINISHING_MULTIPLIER = 1
-
+TESTING = True
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
-    return render_template("register.html")
+    if request.method == "GET":
+        return render_template("register.html", filled={})
+    
+    if request.method == "POST":
+        valid = True
+        username  = request.form["username"]
+        if not validate_username(username):
+            valid = False
+
+        password  = request.form["password1"]
+        password2 = request.form["password2"]
+        if not validate_password(password, password2):
+            valid = False
+        
+        if not valid:
+            filled = { "username": username }
+            return render_template("register.html", filled=filled)
+        else:
+            password_hash = generate_password_hash(password)
+            crud.create_user(username, password_hash)
+            user_id = query.get_uid_from_username(username)
+            session["csrf_token"] = secrets.token_hex(16)
+            session["username"] = username
+            session["user_id"] = user_id
+            crud.timestamp_login(user_id)
+            flash("Account created successfully")
+            return redirect("/")
 
 @app.route("/view_report/<int:report_id>")
 def view_report(report_id):
@@ -204,26 +230,6 @@ def search():
     result = query.get_search_results(keywords)
     return render_template("search.html", data=result)
 
-@app.route("/create", methods=["POST"])
-def create():
-    username  = request.form["username"]
-    password  = request.form["password1"]
-    password2 = request.form["password2"]
-    #TODO: validate input
-    validate_username(username)
-    if password != password2:
-        return "Passwords do not match"
-    password_hash = generate_password_hash(password)
-
-    crud.create_user(username, password_hash)
-
-    user_id = query.get_uid_from_username(username)
-    session["csrf_token"] = secrets.token_hex(16)
-    session["username"] = username
-    session["user_id"] = user_id
-    crud.timestamp_login(user_id)
-    return redirect("/")
-
 @app.route("/login", methods=["POST"])
 def login():
     username = request.form["username"]
@@ -279,11 +285,32 @@ def tastes_valid(tastes):
 
 def validate_username(username):
     allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    valid = True
     if 3 > len(username) > 20:
-        return "username must be between 3 and 20 characters"
+        flash("Username must be between 3 and 20 characters")
+        valid = False
     for char in username:
         if not char in allowed_username_characters:
-            return f"username may only contain {allowed_username_characters}"
+            flash(f"Username may only contain {allowed_username_characters}")
+            valid = False
+            break
+    return valid
+
+def validate_password(a, b):
+    valid = True
+    if a != b:
+        flash("Passwords do not match")
+        valid = False
+    if TESTING:
+        if len(a) == 0 or len(b) == 0:
+            flash("Password may not be empty")
+            valid = False
+    else:
+        if len(a) < 8 or len(b) < 8:
+            flash("Password must be 8 characters or longer")
+            valid = False
+            #TODO even stronger password
+    return valid
 
 def validate_reportform_contents(category, color, culinaryvalue, tastes):
     if not category in [str(i) for i in range(1,16)]:

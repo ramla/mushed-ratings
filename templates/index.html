@@ -3,6 +3,9 @@
 {% block content %}
   <div class="base-container"><h1>MushEd Ratings</h1>
     <p>Welcome to MushEd, the most trusted Mushroom Edibility Tracker!</p>
+    {% for message in get_flashed_messages() %}
+    <p class="flash">{{ message }}</p>
+    {% endfor %}
     {% if session.user_id %}
     <p class="indented">
       Logged in as <a href="{{ url_for('view_user', user_id=session.user_id) }}">{{ session.username }}</a>.
