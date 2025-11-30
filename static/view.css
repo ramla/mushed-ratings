@@ -27,3 +27,7 @@ th, td {
     display: inline-block;
     box-sizing: border-box;
 }
+.edibility-percentage {
+    width: 3.5em;
+    display: inline-block;
+}

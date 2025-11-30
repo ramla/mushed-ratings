@@ -116,7 +116,7 @@ def create_symptom_report(report_id):
     colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
     symptom_reps  = [ row for row in query.get_report_healthvalues(report_id) ]
     symptom_counts = [ (healthvalue, count_blanched, count_unblanched) 
-                for healthvalue, count_blanched, count_unblanched in symptom_reps ]
+                    for healthvalue, count_blanched, count_unblanched in symptom_reps ]
 
     return render_template("create_symptom_report.html", fetched=report, colors=colors, 
                         tastes=tastes, culvalues=culinaryvalues, categories=categories, 
@@ -129,18 +129,13 @@ def send_symptom_report():
     check_csrf()
     user_id       = session["user_id"]
     report_id     = request.form.get("report_id")
+    require_report_exists(report_id)
+
     healthvalue   = request.form.get("healthvalue")
     blanched      = request.form.get("blanched")
-    if blanched:
-        blanched = 1
-    else:
-        blanched = 0
-    
-    if not healthvalue in [str(i) for i in range(1,6)]:
-        if healthvalue == 0:
-            return "symptom report deletion not implemented yet"
-        abort(418)
-    
+    error = validate_symptomform_contents(healthvalue, blanched)
+    if error:
+        return error
     n_symptom_reports = query.get_n_symptom_reports_for(report_id)
     reward = max(SYMPTOM_REWARD_MIN, SYMPTOM_REWARD - int((SYMPTOM_REWARD_DIMINISHING_MULTIPLIER * n_symptom_reports)))
     crud.insert_symptom_report(user_id, report_id, healthvalue, blanched, reward)
@@ -329,6 +324,16 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
 def require_report_exists(report_id):
     if not query.report_exists(report_id):
         abort(404)
+
+def validate_symptomform_contents(healthvalue, blanched):
+    if not healthvalue in [str(i) for i in range(1,6)]:
+        print(healthvalue)
+        if healthvalue == 5:
+            return "value not yet in use"
+        abort(418)
+    print(blanched)
+    if not (blanched == "0" or blanched == "1"):
+        abort(418)
 
 def check_csrf():
     if request.form["csrf_token"] != session["csrf_token"]:

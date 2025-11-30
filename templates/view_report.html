@@ -46,9 +46,9 @@
             <tr>
                 <td>Edibility (unblanched)</td>
                 <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
-                        {% if count_blanched %}
-                            {% if symptom_counts[0][1] > 0 and hid and count_blanched > 0 %}
-                                {{ healthvalues[hid].name }}: {{ count_blanched / symptom_counts[0][1] * 100 }}%<br>
+                        {% if count_unblanched %}
+                            {% if symptom_counts[0][2] > 0 and hid and count_unblanched > 0 %}
+                                <div class="edibility-percentage">{{ '%0.1f' | format( count_unblanched / symptom_counts[0][2] * 100 | float) }}%</div> {{ healthvalues[hid].name }}<br>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
@@ -57,9 +57,9 @@
             <tr>
                 <td>Edibility Blanched</td>
                 <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
-                        {% if count_unblanched %}
-                            {% if symptom_counts[0][2] > 0 and hid and count_unblanched > 0 %}
-                                {{ healthvalues[hid].name }}: {{ count_unblanched / symptom_counts[0][2] * 100 }}%<br>
+                        {% if count_blanched %}
+                            {% if symptom_counts[0][1] > 0 and hid and count_blanched > 0 %}
+                                <div class="edibility-percentage">{{ '%0.1f' | format( count_blanched / symptom_counts[0][1] * 100 | float) }}%</div> {{ healthvalues[hid].name }}<br>
                             {% endif %}
                         {% endif %}
                     {% endfor %}
