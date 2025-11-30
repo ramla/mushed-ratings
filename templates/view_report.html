@@ -25,15 +25,15 @@
             </tr>
             <tr>
                 <td>Username</td>
-                <td>{{ fetched.user_name }}</td>
+                <td><a href="{{ url_for('view_user', user_id=fetched.user_id) }}">{{ fetched.user_name }}</a></td>
             </tr>
             <tr>
                 <td>Category</td>
-                <td>{{ fetched.category_name }}</td>
+                <td><a href="{{ url_for('search', query=fetched.category_name) }}">{{ fetched.category_name }}</a></td>
             </tr>
             <tr>
                 <td>Color</td>
-                <td><div class="colorblock" style="background-color: {{ fetched.color_hex }}"></div>{{ fetched.color_name }}</td>
+                <td><div class="colorblock" style="background-color: {{ fetched.color_hex }}"></div><a href="{{ url_for('search', query=fetched.color_name) }}">{{ fetched.color_name }}</a></td>
             </tr>
             <tr>
                 <td>Taste</td>
@@ -41,7 +41,7 @@
             </tr>
             <tr>
                 <td>Culinary Value</td>
-                <td>{{ fetched.culinaryvalue_name }}</td>
+                <td><a href="{{ url_for('search', query=fetched.culinaryvalue_name) }}">{{ fetched.culinaryvalue_name }}</a></td>
             </tr>
             <tr>
                 <td>Edibility (unblanched)</td>
