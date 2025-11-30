@@ -51,9 +51,9 @@ def register():
 
 @app.route("/view_report/<int:report_id>")
 def view_report(report_id):
-    if "user_id" not in session:
+    logged_in = require_login()
+    if not logged_in:
         return redirect("/")
-
 
     colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
     report_tastes = query.get_report_taste_strings(report_id)
@@ -72,7 +72,8 @@ def view_report(report_id):
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):
-    if "user_id" not in session:
+    logged_in = require_login()
+    if not logged_in:
         return redirect("/")
 
     user_data = query.get_user_data(user_id)
@@ -95,7 +96,8 @@ def view_user(user_id):
 @app.route("/create_report/")
 def create_report(report_id=None):
     taste_ids = []
-    if "user_id" not in session:
+    logged_in = require_login()
+    if not logged_in:
         return redirect("/")
     if report_id is None:
         report = None
@@ -108,7 +110,9 @@ def create_report(report_id=None):
 
 @app.route("/create_symptom_report/<int:report_id>")
 def create_symptom_report(report_id):
-    require_login()
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
     require_report_exists(report_id)
 
     report = query.get_report_details(report_id)
@@ -125,7 +129,8 @@ def create_symptom_report(report_id):
 
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
-    require_login()
+    if not logged_in:
+        return redirect("/")
     check_csrf()
     user_id       = session["user_id"]
     report_id     = request.form.get("report_id")
@@ -146,7 +151,9 @@ def send_symptom_report():
 
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
-    require_login()
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
     owner_id = query.get_report_owner(report_id)
     require_report_ownership(owner_id)
     return create_report(report_id=report_id)
@@ -154,7 +161,9 @@ def edit_report(report_id):
 
 @app.route("/send_report_edit/<int:report_id>", methods=["POST"])
 def send_report_edit(report_id):
-    require_login()
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
     check_csrf()
     if not query.report_exists(report_id):
         abort(404)
@@ -176,7 +185,9 @@ def send_report_edit(report_id):
 
 @app.route("/send_report", methods=["POST"])
 def send_report():
-    require_login()
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
     check_csrf()
     category, color, culinaryvalue, tastes = get_reportform_contents()
     identical_report = validate_reportform_contents(category, color, culinaryvalue, tastes)
@@ -195,7 +206,9 @@ def send_report():
 
 @app.route("/delete_report/<int:report_id>")
 def delete_report(report_id):
-    require_login()
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
     owner_id = query.get_report_owner(report_id)
     require_report_ownership(owner_id)
 
@@ -218,7 +231,9 @@ def report_fatality(user_id):
 
 @app.route("/search", methods=["GET"])
 def search():
-    require_login()
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
     keywords = request.args.get("query")
     #TODO: validate input
     #TODO: multiword search how
@@ -249,7 +264,9 @@ def logout():
 
 def require_login():
     if "user_id" not in session:
-        abort(403)
+        flash("Please log in or sign up")
+        return False
+    return True
 
 def require_report_ownership(report_id):
     owner_id = query.get_report_owner(report_id)
