@@ -19,6 +19,7 @@
         <li>New activity listing</li>
         <li>Improved security</li>
         <li>Better search</li>
+        <li>User-friendlier error message delivery </li>
         <li>Fatalities reporting</li>
       </ul>
     </p>
@@ -44,10 +45,13 @@
               <summary class="faq">How do I proceed?</summary>
                   <div class="toggle-info">
                       <a href="{{ url_for('register') }}">Create your account now</a> and 
-                      <a href="{{ url_for('create_report') }}">report your findings</a> to claim your well earned credits*. 
-                      Remember to check back on <a href="{{ url_for('all_reports') }}">what others have tasted</a>!</p>
+                      <a href="{{ url_for('create_report') }}">report your findings</a> to claim your well earned 
+                      credits*. Do keep in mind the evidence of your culinary journey will be reviewed upon 
+                      your return.</p>
+                      
+                      <p>Remember to check back on <a href="{{ url_for('all_reports') }}">what others have tasted</a>!</p>
                       <p>Pro tip: When eating a mushroom for the first time, it's safer to try it blanched first.</p>
-                      <span class="fine-print">* Not yet implemented</span>
+                      <span class="fine-print">* Not yet completely implemented</span>
                   </div>
           </details>
       </div>
