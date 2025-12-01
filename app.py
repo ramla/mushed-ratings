@@ -129,6 +129,7 @@ def create_symptom_report(report_id):
 
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
+    logged_in = require_login()
     if not logged_in:
         return redirect("/")
     check_csrf()
