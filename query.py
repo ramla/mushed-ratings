@@ -168,7 +168,7 @@ def get_n_symptom_reports_for(report_id):
 
 def get_search_results(keywords):
     keywords = "%" + keywords + "%"
-    sql = """   SELECT r.id, r.date, r.uid,
+    sql = """   SELECT r.id, r.date, r.uid, r.deleted,
                 u.name AS user_name, 
                 c.name AS color_name, 
                 cat.name AS category_name, 
