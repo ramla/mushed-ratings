@@ -208,6 +208,7 @@ def send_report():
 @app.route("/delete_report/<int:report_id>")
 def delete_report(report_id):
     logged_in = require_login()
+    check_csrf()
     if not logged_in:
         return redirect("/")
     owner_id = query.get_report_owner(report_id)
