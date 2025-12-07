@@ -33,10 +33,18 @@ def register():
             valid = False
 
         if not valid:
-            filled = { "username": username }
+            filled = { "username": username,
+                       "password1": password,
+                       "password2": password2 }
             return render_template("register.html", filled=filled)
         password_hash = generate_password_hash(password)
-        crud.create_user(username, password_hash)
+        error = crud.create_user(username, password_hash)
+        if error:
+            flash(error)
+            filled = { "username": username,
+                       "password1": password,
+                       "password2": password2 }
+            return render_template("register.html", filled=filled)
         user_id = query.get_uid_from_username(username)
         session["csrf_token"] = secrets.token_hex(16)
         session["username"] = username

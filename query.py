@@ -2,8 +2,8 @@ import db
 
 
 def get_auth(username):
-    sql = """   SELECT auth, id 
-                FROM users 
+    sql = """   SELECT auth, id
+                FROM users
                 WHERE name = ?
             """
     password_hash, user_id = db.query(sql, [username])[0]
@@ -25,7 +25,7 @@ def get_report_strings():
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
     categories     = db.query("SELECT id, name FROM categories")
     healthvalues   = db.query("SELECT id, name, description FROM healthvalues")
-    return (colors, tastes, culinaryvalues, categories, 
+    return (colors, tastes, culinaryvalues, categories,
             { id: { "name": name,
                     "description": description } 
             for id, name, description in healthvalues } )
@@ -137,10 +137,10 @@ def report_exists_with(category, color, culinaryvalue, taste_ids):
             """
     params = (category, color, culinaryvalue)
     result = db.query(sql, params)
-    
+
     if len(result) == 0 or taste_ids == []:
         return None
-    
+
     report_id = result[0][0]
     sql = """   SELECT 1
                     FROM report_tastes

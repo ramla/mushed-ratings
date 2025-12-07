@@ -4,17 +4,17 @@ import db
 
 def create_user(username, password_hash):
     try:
-        sql = """   INSERT INTO users 
+        sql = """   INSERT INTO users
                         (name, auth) 
                         VALUES (?, ?)
                 """
         db.execute(sql, [username, password_hash])
     except sqlite3.IntegrityError:
         return "Username already taken"
-
+    return None
 
 def insert_report(uid, category, color, culinaryvalue):
-    sql = """   INSERT INTO reports 
+    sql = """   INSERT INTO reports
                     (uid, date, category, color, culinaryvalue) 
                     VALUES (?, datetime('now'), ?, ?, ?) 
             """
@@ -23,7 +23,7 @@ def insert_report(uid, category, color, culinaryvalue):
 
 
 def insert_tastes(report_id, tastes):
-    sql = """   INSERT INTO report_tastes 
+    sql = """   INSERT INTO report_tastes
                     (report_id, tastes_id) 
                 VALUES (?, ?)
             """
@@ -60,16 +60,16 @@ def timestamp_login(user_id):
     param = (user_id, )
     db.execute(sql, param)
 
-def update_user_credits(user_id, credits):
+def update_user_credits(user_id, amount):
     sql = """   UPDATE users
                     SET credits = credits + ?
                 WHERE users.id = ?
                 """
-    params = (credits, user_id)
+    params = (amount, user_id)
     db.execute(sql, params)
 
 def update_report(category, color, culinaryvalue, report_id):
-    sql = """   UPDATE reports 
+    sql = """   UPDATE reports
                     SET category = ?, color = ?, culinaryvalue = ?
                 WHERE id = ?
             """
@@ -81,5 +81,5 @@ def update_report_tastes(report_id, tastes):
                             WHERE report_id = ?
                         """
     db.execute(delete_tastes_sql, [report_id, ])
-        
+
     insert_tastes(report_id, tastes)

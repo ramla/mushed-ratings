@@ -1,6 +1,6 @@
 import sqlite3
-from flask import g
 from pathlib import Path
+from flask import g
 
 def get_connection():
     create_new = False
@@ -9,12 +9,12 @@ def get_connection():
         create_new = True
     con = sqlite3.connect("database.db")
     if create_new:
-        with open("schema.sql", "r") as schema_file:
+        with open("schema.sql", "r", encoding="utf-8") as schema_file:
             schema = schema_file.read()
             cursor = con.cursor()
             cursor.executescript(schema)
             con.commit()
-        with open("init.sql", "r") as init_file:
+        with open("init.sql", "r", encoding="utf-8") as init_file:
             init_db = init_file.read()
             cursor = con.cursor()
             cursor.executescript(init_db)
