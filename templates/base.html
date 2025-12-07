@@ -22,6 +22,7 @@
                 <summary>Search</summary>
                     <div class="toggle-content">
                         <form class="search-form" action="/search" method="GET">
+                                <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
                                 <input type="text" name="query" placeholder="Search from reports" required>
                                 <input type="submit" value="Search">
                         </form>
