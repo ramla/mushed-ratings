@@ -8,7 +8,7 @@ import crud
 import query
 
 app = Flask(__name__)
-app.secret_key = config.secret_key
+app.secret_key = config.SECRET_KEY
 REPORT_REWARD       = 15
 SYMPTOM_REWARD      = 10
 SYMPTOM_REWARD_MIN  = 2
