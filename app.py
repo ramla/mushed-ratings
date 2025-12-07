@@ -219,13 +219,6 @@ def delete_report(report_id):
 
     return redirect(url_for("view_report", report_id=report_id))
 
-#TODO: make this obsolete
-@app.route("/all_reports")
-def all_reports():
-    sql = "SELECT * FROM reports"
-    reports = db.query(sql)
-    return render_template("reports.html", data=reports)
-
 @app.route("/report_fatality/<int:user_id>")
 def report_fatality(user_id):
     return "not yet implemented, please contact support"
