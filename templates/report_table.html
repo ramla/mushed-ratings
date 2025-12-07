@@ -1,0 +1,65 @@
+{% if fetched.deleted %}
+<h2>Report deleted by user</h2>
+{% else %}
+<h2>Sampling report</h2>
+    <table>
+        <tbody>
+            <tr>
+                <td>Report ID</td>
+                <td>{{ fetched.id }}</td>
+            </tr>
+            <tr>
+                <td>Date reported</td>
+                <td>{{ fetched.date }}</td>
+            </tr>
+            <tr>
+                <td>Username</td>
+                <td><a href="{{ url_for('view_user', user_id=fetched.user_id) }}">{{ fetched.user_name }}</a></td>
+            </tr>
+            <tr>
+                <td>Category</td>
+                <td><a href="{{ url_for('search', query=fetched.category_name) }}">{{ fetched.category_name }}</a></td>
+            </tr>
+            <tr>
+                <td>Color</td>
+                <td><div class="colorblock" style="background-color: {{ fetched.color_hex }}"></div><a href="{{ url_for('search', query=fetched.color_name) }}">{{ fetched.color_name }}</a></td>
+            </tr>
+            <tr>
+                <td>Taste</td>
+                <td>{% for taste in report_tastes %}{{ taste.name }}<br>{% endfor %}</td>
+            </tr>
+            <tr>
+                <td>Culinary Value</td>
+                <td><a href="{{ url_for('search', query=fetched.culinaryvalue_name) }}">{{ fetched.culinaryvalue_name }}</a></td>
+            </tr>
+            <tr>
+                <td>Edibility (unblanched)</td>
+                <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
+                        {% if count_unblanched %}
+                            {% if symptom_counts[0][2] > 0 and hid and count_unblanched > 0 %}
+                                <div class="edibility-percentage">{{ '%0.1f' | format( count_unblanched / symptom_counts[0][2] * 100 | float) }}%</div> {{ healthvalues[hid].name }}<br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>Edibility Blanched</td>
+                <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
+                        {% if count_blanched %}
+                            {% if symptom_counts[0][1] > 0 and hid and count_blanched > 0 %}
+                                <div class="edibility-percentage">{{ '%0.1f' | format( count_blanched / symptom_counts[0][1] * 100 | float) }}%</div> {{ healthvalues[hid].name }}<br>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <p><a class="note" href="{{ url_for('create_symptom_report', report_id = fetched.id) }}">Post a symptom report</a>
+    {% if session.user_id == fetched.user_id %}
+        <br><a class="note" href="{{ url_for('edit_report', report_id = fetched.id) }}">Edit Report {{ fetched.id }}</a>
+        <br><a class="note" href="{{ url_for('delete_report', report_id = fetched.id) }}">Delete Report {{ fetched.id }}</a>
+    {% endif %}
+    </p>
+{% endif %}

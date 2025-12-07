@@ -15,60 +15,7 @@
 <h2>Edit symptom report for</h2>
 {% else %}
 <h2>Create symptom report for</h2>
-    <table>
-        <tbody>
-            <tr>
-                <td>Report ID</td>
-                <td>{{ fetched.id }}</td>
-            </tr>
-            <tr>
-                <td>Date reported</td>
-                <td>{{ fetched.date }}</td>
-            </tr>
-            <tr>
-                <td>Username</td>
-                <td>{{ fetched.user_name }}</td>
-            </tr>
-            <tr>
-                <td>Category</td>
-                <td>{{ fetched.category_name }}</td>
-            </tr>
-            <tr>
-                <td>Color</td>
-                <td><div class="colorblock" style="background-color: {{ fetched.color_hex }}"></div>{{ fetched.color_name }}</td>
-            </tr>
-            <tr>
-                <td>Taste</td>
-                <td>{% for taste in report_tastes %}{{ taste.name }}<br>{% endfor %}</td>
-            </tr>
-            <tr>
-                <td>Culinary Value</td>
-                <td>{{ fetched.culinaryvalue_name }}</td>
-            </tr>
-            <tr>
-                <td>Edibility (unblanched)</td>
-                <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
-                        {% if count_unblanched %}
-                            {% if symptom_counts[0][2] > 0 and hid and count_unblanched > 0 %}
-                                <div class="edibility-percentage">{{ '%0.1f' | format( count_unblanched / symptom_counts[0][2] * 100 | float) }}%</div> {{ healthvalues[hid].name }}<br>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-            <tr>
-                <td>Edibility Blanched</td>
-                <td>{% for hid, count_blanched, count_unblanched in symptom_counts %}
-                        {% if count_blanched %}
-                            {% if symptom_counts[0][1] > 0 and hid and count_blanched > 0 %}
-                                <div class="edibility-percentage">{{ '%0.1f' | format( count_blanched / symptom_counts[0][1] * 100 | float) }}%</div> {{ healthvalues[hid].name }}<br>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    {% include 'report_table.html' %}
     <form action="{{ url_for('send_symptom_report') }}" method="post">
         <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
         <input type="hidden" name="report_id" value="{{ fetched.id }}">
