@@ -171,29 +171,20 @@ def send_report_edit(report_id):
     if not query.report_exists(report_id):
         abort(404)
     require_report_ownership(report_id)
+    session_user = session["user_id"]
 
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
     identical_report = validate_reportform_contents(category_new, color_new,
                                                     culinaryvalue_new, tastes_new)
-    set_deleted = True
-    # in case other users posted symptom reports: find first other user
-    sreport = query.get_earliest_symptom_report(report_id, not_from=session["user_id"])
-    if sreport:
-        sreport = sreport[0]
-        # update report uid to first other user with symptom report
-        crud.update_report_uid(report_id, sreport["uid"])
-        # add report credits to that first other user
-        crud.update_user_credits(sreport["uid"], REPORT_REWARD)
-        set_deleted = False
     if identical_report:
         identical_report_id = identical_report[1][0]
         # Annul credits,
-        crud.update_user_credits(session["user_id"], -REPORT_REWARD)
+        crud.update_user_credits(session_user, -REPORT_REWARD)
         # in case of user reported symptoms:
         # update session_users symptom reports to point to found identical_report
-        crud.move_symptom_reports(report_id, identical_report_id, session["user_id"])
+        crud.move_symptom_reports(report_id, identical_report_id, session_user)
         # delete original report if it's not needed:
-        if set_deleted:
+        if not other_user_posted_symptom_reports(report_id, session_user):
             crud.set_report_deleted(report_id)
     else:
         # just edit report
@@ -240,9 +231,8 @@ def delete_report():
     report_id = request.form.get("report_id")
     owner_id = query.get_report_owner(report_id)
     require_report_ownership(owner_id)
-
-    crud.set_report_deleted(report_id)
-
+    if not other_user_posted_symptom_reports(report_id, owner_id):
+        crud.set_report_deleted(report_id)
     crud.update_user_credits(owner_id, -REPORT_REWARD)
 
     return redirect(url_for("view_report", report_id=report_id))
@@ -373,3 +363,16 @@ def validate_symptomform_contents(healthvalue, blanched):
 def check_csrf():
     if request.form["csrf_token"] != session["csrf_token"]:
         abort(403)
+
+def other_user_posted_symptom_reports(report_id, session_user):
+    # in case other users posted symptom reports: find first other user
+    sreport = query.get_earliest_symptom_report(report_id, not_from=session_user)
+    if sreport:
+        print("täälä kuitenkin")
+        first_other_user_id = sreport[0]["uid"]
+        # update report uid to first other user with symptom report
+        crud.update_report_uid(report_id, first_other_user_id)
+        # add report credits to that first other user
+        crud.update_user_credits(first_other_user_id, REPORT_REWARD)
+        return True
+    return False
