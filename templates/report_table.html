@@ -56,10 +56,14 @@
             </tr>
         </tbody>
     </table>
-    <p><a class="note" href="{{ url_for('create_symptom_report', report_id = fetched.id) }}">Post a symptom report</a>
+    <p><a class="note" href="{{ url_for('create_symptom_report', report_id = fetched.id) }}">Post a Symptom Report on Report {{ fetched.id }}</a>
     {% if session.user_id == fetched.user_id %}
-        <br><a class="note" href="{{ url_for('edit_report', report_id = fetched.id) }}">Edit Report {{ fetched.id }}</a>
-        <br><a class="note" href="{{ url_for('delete_report', report_id = fetched.id) }}">Delete Report {{ fetched.id }}</a>
+        <p><a class="note" href="{{ url_for('edit_report', report_id = fetched.id) }}">Edit Report {{ fetched.id }}</a></p>
+        <form action="/delete_report" method="post" style="display:inline-block; margin:0;">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}" />
+            <input type="hidden" name="report_id" value="{{ fetched.id }}" />
+            <button type="submit" class="link-button">Delete Report {{ fetched.id }}</button>
+        </form>
     {% endif %}
     </p>
 {% endif %}

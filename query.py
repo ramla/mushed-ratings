@@ -12,6 +12,20 @@ def get_auth(username):
 def get_availabe_tastes_count():
     return db.query("SELECT COUNT(id) FROM tastes")[0][0]
 
+def get_earliest_symptom_report(report_id, not_from=None):
+    sql = """   SELECT sr.uid, sr.date
+                FROM symptomreports AS sr
+                WHERE sr.report_id = ?
+            """
+    params = (report_id, )
+    if not_from:
+        sql += """AND sr.uid != ?
+        """
+        params = (report_id, not_from)
+    end = """   ORDER BY sr.date
+            """
+    return db.query(sql + end, params)
+
 def get_valid_taste_ids():
     result = db.query("SELECT id FROM tastes")
     id_list = []
@@ -129,7 +143,7 @@ def report_exists(report_id):
 
 
 def report_exists_with(category, color, culinaryvalue, taste_ids):
-    sql = """   SELECT id
+    sql = """   SELECT id, deleted
                     FROM reports
                 WHERE category = ?
                     AND color = ?
@@ -141,7 +155,7 @@ def report_exists_with(category, color, culinaryvalue, taste_ids):
     if len(result) == 0 or taste_ids == []:
         return None
 
-    report_id = result[0][0]
+    report_id, deleted = result[0][0], result[0][1]
     sql = """   SELECT 1
                     FROM report_tastes
                 WHERE report_id = ?
@@ -153,7 +167,7 @@ def report_exists_with(category, color, culinaryvalue, taste_ids):
     sql += ")"
     matches = db.query(sql, [report_id] + taste_ids)
     if len(matches) == len(taste_ids):
-        return report_id
+        return (report_id, deleted)
     return None
 
 

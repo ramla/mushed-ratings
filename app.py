@@ -175,14 +175,32 @@ def send_report_edit(report_id):
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
     identical_report = validate_reportform_contents(category_new, color_new,
                                                     culinaryvalue_new, tastes_new)
-    #TODO: Annul credits and delete if edited undeleted mushroom exists
+    # in case other users posted symptom reports: find first other user
+    sreport = query.get_earliest_symptom_report(report_id, not_from=session["user_id"])
+    if sreport:
+        sreport = sreport[0]
+        # update report uid to first other user with symptom report
+        crud.update_report_uid(report_id, sreport["uid"])
+        # add report credits to that first other user
+        crud.update_user_credits(sreport["uid"], REPORT_REWARD)
+    if identical_report:
+        identical_report_id = identical_report[1][0]
+        # Annul credits,
+        crud.update_user_credits(session["user_id"], -REPORT_REWARD)
+        # in case of user reported symptoms:
+        # update session_users symptom reports to point to found identical_report
+        crud.move_symptom_reports(report_id, identical_report_id, session["user_id"])
 
-    category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
-
-    if not (category == category_new and color == color_new and culinaryvalue == culinaryvalue_new):
-        crud.update_report(category_new, color_new, culinaryvalue_new, report_id)
-    if not tastes == tastes_new:
-        crud.update_report_tastes(report_id, tastes_new)
+        # delete original report:
+        crud.set_report_deleted(report_id)
+    else:
+        # just edit report
+        category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
+        if not (category == category_new and color == color_new
+                and culinaryvalue == culinaryvalue_new):
+            crud.update_report(category_new, color_new, culinaryvalue_new, report_id)
+        if not tastes == tastes_new:
+            crud.update_report_tastes(report_id, tastes_new)
 
     return redirect(url_for("view_report", report_id=report_id))
 
@@ -193,27 +211,35 @@ def send_report():
     if not logged_in:
         return redirect("/")
     check_csrf()
+    uid = session["user_id"]
     category, color, culinaryvalue, tastes = get_reportform_contents()
     identical_report = validate_reportform_contents(category, color, culinaryvalue, tastes)
     if identical_report:
-        return identical_report
+        error = identical_report[0]
+        identical_report_id, deleted = identical_report[1][0], identical_report[1][1]
 
-    uid = session["user_id"]
-    crud.insert_report(uid, category, color, culinaryvalue)
+        if deleted == 0:
+            return error
+        crud.update_report_uid(identical_report_id, uid)
+        return redirect(url_for("view_report", report_id=identical_report_id))
+    else:            
 
-    report_id = db.last_insert_id()
-    crud.insert_tastes(report_id, tastes)
+        crud.insert_report(uid, category, color, culinaryvalue)
 
-    crud.update_user_credits(uid, REPORT_REWARD)
+        report_id = db.last_insert_id()
+        crud.insert_tastes(report_id, tastes)
 
-    return redirect(url_for("view_report", report_id=report_id))
+        crud.update_user_credits(uid, REPORT_REWARD)
 
-@app.route("/delete_report/<int:report_id>")
-def delete_report(report_id):
+        return redirect(url_for("view_report", report_id=report_id))
+
+@app.route("/delete_report", methods=["POST"])
+def delete_report():
     logged_in = require_login()
     check_csrf()
     if not logged_in:
         return redirect("/")
+    report_id = request.form.get("report_id")
     owner_id = query.get_report_owner(report_id)
     require_report_ownership(owner_id)
 
@@ -279,8 +305,6 @@ def get_reportform_contents():
     tastes = [ i for i in range(1,int(tastecount)+1) if request.form.get(f"taste{i}") ]
     culinaryvalue = request.form.get("culvalue")
 
-    validate_reportform_contents(category, color, culinaryvalue, tastes)
-
     return (category, color, culinaryvalue, tastes)
 
 def tastes_valid(tastes):
@@ -330,7 +354,7 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
     identical_report = query.report_exists_with(category=category, color=color,
                                                 culinaryvalue=culinaryvalue, taste_ids=tastes)
     if not identical_report is None:
-        return f"identical report already exists: Report {identical_report}"
+        return (f"identical report already exists: Report {identical_report}", identical_report)
     return None
 
 def require_report_exists(report_id):

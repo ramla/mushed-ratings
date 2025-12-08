@@ -44,6 +44,16 @@ def insert_symptom_report(user_id, report_id, healthvalue, blanched, reward):
     db.execute(sql, params)
 
 
+def move_symptom_reports(from_report_id, to_report_id, user_id):
+    sql = """   UPDATE symptomreports
+                    SET report_id = ?
+                WHERE report_id = ?
+                    AND uid = ?
+            """
+    params = (to_report_id, from_report_id, user_id)
+    db.execute(sql, params)
+
+
 def set_report_deleted(report_id):
     sql = """
             UPDATE reports 
@@ -75,6 +85,12 @@ def update_report(category, color, culinaryvalue, report_id):
             """
     db.execute(sql, [category, color, culinaryvalue, report_id])
 
+def update_report_uid(report_id, user_id):
+    sql = """   UPDATE reports
+                    SET uid = ?, deleted = 0, date = datetime('now')
+                WHERE id = ?"""
+    params = (user_id, report_id)
+    db.execute(sql, params)
 
 def update_report_tastes(report_id, tastes):
     delete_tastes_sql = """ DELETE FROM report_tastes
