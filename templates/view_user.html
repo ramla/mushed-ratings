@@ -54,7 +54,7 @@
                     {% for i in range(symptom_reports|length) %}
                         {% if i < 10 %}
                             <a href="{{ url_for('view_report', report_id=symptom_reports[i].report_id) }}">Report {{ symptom_reports[i].report_id }}</a>: {{ symptom_reports[i].name }}
-                            <br>{{ symptom_reports[i].date }}, {% if symptom_reports[i].blanched == 1 %}blanched{% else %}unblanched<br>
+                            <br>{{ symptom_reports[i].date }}, {% if symptom_reports[i].blanched == 1 %}blanched<br>{% else %}unblanched<br>
                         {% endif %}
                         {% endif %}
                     {% endfor %}
