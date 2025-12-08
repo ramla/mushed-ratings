@@ -175,6 +175,7 @@ def send_report_edit(report_id):
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
     identical_report = validate_reportform_contents(category_new, color_new,
                                                     culinaryvalue_new, tastes_new)
+    set_deleted = True
     # in case other users posted symptom reports: find first other user
     sreport = query.get_earliest_symptom_report(report_id, not_from=session["user_id"])
     if sreport:
@@ -183,6 +184,7 @@ def send_report_edit(report_id):
         crud.update_report_uid(report_id, sreport["uid"])
         # add report credits to that first other user
         crud.update_user_credits(sreport["uid"], REPORT_REWARD)
+        set_deleted = False
     if identical_report:
         identical_report_id = identical_report[1][0]
         # Annul credits,
@@ -190,9 +192,9 @@ def send_report_edit(report_id):
         # in case of user reported symptoms:
         # update session_users symptom reports to point to found identical_report
         crud.move_symptom_reports(report_id, identical_report_id, session["user_id"])
-
-        # delete original report:
-        crud.set_report_deleted(report_id)
+        # delete original report if it's not needed:
+        if set_deleted:
+            crud.set_report_deleted(report_id)
     else:
         # just edit report
         category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
@@ -222,16 +224,12 @@ def send_report():
             return error
         crud.update_report_uid(identical_report_id, uid)
         return redirect(url_for("view_report", report_id=identical_report_id))
-    else:            
 
-        crud.insert_report(uid, category, color, culinaryvalue)
-
-        report_id = db.last_insert_id()
-        crud.insert_tastes(report_id, tastes)
-
-        crud.update_user_credits(uid, REPORT_REWARD)
-
-        return redirect(url_for("view_report", report_id=report_id))
+    crud.insert_report(uid, category, color, culinaryvalue)
+    report_id = db.last_insert_id()
+    crud.insert_tastes(report_id, tastes)
+    crud.update_user_credits(uid, REPORT_REWARD)
+    return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/delete_report", methods=["POST"])
 def delete_report():
