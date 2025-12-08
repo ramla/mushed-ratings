@@ -249,6 +249,7 @@ def delete_report():
 
 @app.route("/report_fatality/<int:user_id>")
 def report_fatality(user_id):
+    print(f"unimplemented: fatality reported of user {user_id}")
     return "not yet implemented, please contact support"
 
 @app.route("/search", methods=["GET"])
