@@ -224,7 +224,7 @@ def get_user_report_count(user_id):
 
 
 def get_user_reports(user_id):
-    sql = """   SELECT r.id, r.date,
+    sql = """   SELECT r.id, r.date, r.deleted,
                 c.name AS color_name,
                 cat.name AS category_name,
                 cv.name AS culinaryvalue_name

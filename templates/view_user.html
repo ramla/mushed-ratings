@@ -32,8 +32,10 @@
                 <td>Reported samplings</td>
                 <td>{% if reports|length > 0 %}
                     {% for i in range(reports|length) %}
-                        {% if i < 10 %}
+                        {% if i < 9 %}
+                            {% if not reports[i].deleted %}
                             <a href="{{ url_for('view_report', report_id=reports[i].id) }}">Report {{ reports[i].id }}</a><br>
+                            {% endif %}
                         {% endif %}
                         {% if i == 9 %}
                             <span class="note">
