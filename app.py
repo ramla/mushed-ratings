@@ -176,6 +176,8 @@ def send_report_edit(report_id):
     category_new, color_new, culinaryvalue_new, tastes_new = get_reportform_contents()
     identical_report = validate_reportform_contents(category_new, color_new,
                                                     culinaryvalue_new, tastes_new)
+    # handle case of other user posted symptom reports
+    original_not_needed = not other_user_posted_symptom_reports(report_id, session_user)
     if identical_report:
         identical_report_id = identical_report[1][0]
         # Annul credits,
@@ -184,17 +186,23 @@ def send_report_edit(report_id):
         # update session_users symptom reports to point to found identical_report
         crud.move_symptom_reports(report_id, identical_report_id, session_user)
         # delete original report if it's not needed:
-        if not other_user_posted_symptom_reports(report_id, session_user):
+        if original_not_needed:
             crud.set_report_deleted(report_id)
     else:
-        # just edit report
         category, color, culinaryvalue, tastes = query.get_report_raw(report_id)
-        if not (category == category_new and color == color_new
-                and culinaryvalue == culinaryvalue_new):
-            crud.update_report(category_new, color_new, culinaryvalue_new, report_id)
-        if not tastes == tastes_new:
-            crud.update_report_tastes(report_id, tastes_new)
-
+        if original_not_needed:
+            # just edit report
+            if not (category == category_new and color == color_new
+                    and culinaryvalue == culinaryvalue_new):
+                crud.update_report(category_new, color_new, culinaryvalue_new, report_id)
+            if not tastes == tastes_new:
+                crud.update_report_tastes(report_id, tastes_new)
+        else:
+            # create new report
+            crud.insert_report(session_user, category, color, culinaryvalue)
+            new_report_id = db.last_insert_id()
+            crud.insert_tastes(new_report_id, tastes_new)
+            return redirect(url_for("view_report", report_id=new_report_id))
     return redirect(url_for("view_report", report_id=report_id))
 
 
@@ -234,6 +242,7 @@ def delete_report():
     if not other_user_posted_symptom_reports(report_id, owner_id):
         crud.set_report_deleted(report_id)
     crud.update_user_credits(owner_id, -REPORT_REWARD)
+    crud.set_symptom_reports_deleted(report_id, owner_id)
 
     return redirect(url_for("view_report", report_id=report_id))
 
@@ -368,7 +377,6 @@ def other_user_posted_symptom_reports(report_id, session_user):
     # in case other users posted symptom reports: find first other user
     sreport = query.get_earliest_symptom_report(report_id, not_from=session_user)
     if sreport:
-        print("täälä kuitenkin")
         first_other_user_id = sreport[0]["uid"]
         # update report uid to first other user with symptom report
         crud.update_report_uid(report_id, first_other_user_id)

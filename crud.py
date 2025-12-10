@@ -63,6 +63,16 @@ def set_report_deleted(report_id):
     db.execute(sql, [report_id, ])
 
 
+def set_symptom_reports_deleted(report_id, user_id):
+    sql = """   UPDATE symptomreports
+                    SET deleted = 1
+                WHERE report_id = ?
+                    AND uid = ?
+            """
+    params = (report_id, user_id)
+    db.execute(sql, params)
+
+
 def timestamp_login(user_id):
     sql = """   UPDATE users
                     SET lastlogon = datetime('now')
