@@ -18,8 +18,10 @@ def get_auth(username):
                 FROM users
                 WHERE name = ?
             """
-    password_hash, user_id = db.query(sql, [username])[0]
-    return password_hash, user_id
+    result = db.query(sql, [username])
+    if result:
+        return result[0]
+    return False
 
 
 def get_availabe_tastes_count():

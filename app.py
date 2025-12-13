@@ -320,15 +320,17 @@ def login():
     password = request.form["password"]
     redir    = request.form["redirect"]
 
-    password_hash, user_id = query.get_auth(username)
-
-    if check_password_hash(password_hash, password):
-        session["csrf_token"] = secrets.token_hex(16)
-        session["user_id"] = user_id
-        session["username"] = username
-        crud.timestamp_login(user_id)
-        return redirect(redir)
-    return "Wrong username or password"
+    result = query.get_auth(username)
+    if result:
+        password_hash, user_id = result
+        if check_password_hash(password_hash, password):
+            session["csrf_token"] = secrets.token_hex(16)
+            session["user_id"] = user_id
+            session["username"] = username
+            crud.timestamp_login(user_id)
+            return redirect(redir)
+    flash("Wrong username or password")
+    return redirect("/")
 
 
 @app.route("/logout")
