@@ -13,6 +13,7 @@ def create_user(username, password_hash):
         return "Username already taken"
     return None
 
+
 def insert_report(uid, category, color, culinaryvalue):
     sql = """   INSERT INTO reports
                     (uid, date, category, color, culinaryvalue) 
@@ -80,6 +81,7 @@ def timestamp_login(user_id):
     param = (user_id, )
     db.execute(sql, param)
 
+
 def update_user_credits(user_id, amount):
     sql = """   UPDATE users
                     SET credits = credits + ?
@@ -88,6 +90,7 @@ def update_user_credits(user_id, amount):
     params = (amount, user_id)
     db.execute(sql, params)
 
+
 def update_report(category, color, culinaryvalue, report_id):
     sql = """   UPDATE reports
                     SET category = ?, color = ?, culinaryvalue = ?
@@ -95,12 +98,14 @@ def update_report(category, color, culinaryvalue, report_id):
             """
     db.execute(sql, [category, color, culinaryvalue, report_id])
 
+
 def update_report_uid(report_id, user_id):
     sql = """   UPDATE reports
                     SET uid = ?, deleted = 0, date = datetime('now')
                 WHERE id = ?"""
     params = (user_id, report_id)
     db.execute(sql, params)
+
 
 def update_report_tastes(report_id, tastes):
     delete_tastes_sql = """ DELETE FROM report_tastes

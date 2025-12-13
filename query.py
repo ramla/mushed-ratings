@@ -1,5 +1,5 @@
-import settings
 import db
+import settings
 
 class AdvancedSearchQuery:
     def __init__(self, params):
@@ -21,8 +21,10 @@ def get_auth(username):
     password_hash, user_id = db.query(sql, [username])[0]
     return password_hash, user_id
 
+
 def get_availabe_tastes_count():
     return db.query("SELECT COUNT(id) FROM tastes")[0][0]
+
 
 def get_earliest_symptom_report(report_id, not_from=None):
     sql = """   SELECT sr.uid, sr.date
@@ -38,12 +40,14 @@ def get_earliest_symptom_report(report_id, not_from=None):
             """
     return db.query(sql + end, params)
 
+
 def get_most_credits():
     sql = """   SELECT id, name, credits AS amount
                 FROM users
                 ORDER BY credits DESC
         """
     return db.query(sql, [])[0]
+
 
 def get_most_unique_eaten():
     sql = """   SELECT  u.id,
@@ -63,12 +67,14 @@ def get_most_unique_eaten():
         """
     return db.query(sql, [])[0]
 
+
 def get_valid_taste_ids():
     result = db.query("SELECT id FROM tastes")
     id_list = []
     for row in result:
         id_list.append(row[0])
     return id_list
+
 
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")
@@ -81,8 +87,10 @@ def get_report_strings():
                     "description": description } 
             for id, name, description in healthvalues } )
 
+
 def get_tastes_strings():
     return db.query("SELECT id, name, description FROM tastes")
+
 
 def get_report_owner(report_id):
     param = (report_id, )
@@ -239,6 +247,7 @@ def get_search_results(keywords):
             """
     return db.query(sql, [keywords, keywords, keywords, keywords, keywords])
 
+
 def get_search_results_advanced(query:AdvancedSearchQuery):
     taste_ids = []
     if query.taste_ids:
@@ -327,6 +336,7 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
 
     print("\n",sql, "\n\n", params, "\n")
     return db.query(sql, params)
+
 
 def get_uid_from_username(username):
     sql = "SELECT id FROM users WHERE name = ?"

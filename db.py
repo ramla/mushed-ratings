@@ -2,6 +2,7 @@ import sqlite3
 from pathlib import Path
 from flask import g
 
+
 def get_connection():
     create_new = False
     dbfile = Path("database.db")
@@ -23,6 +24,7 @@ def get_connection():
     con.row_factory = sqlite3.Row
     return con
 
+
 def execute(sql, params=None):
     if params is None:
         params = []
@@ -32,8 +34,10 @@ def execute(sql, params=None):
     g.last_insert_id = result.lastrowid
     con.close()
 
+
 def last_insert_id():
     return g.last_insert_id
+
 
 def query(sql, params=None):
     if params is None:

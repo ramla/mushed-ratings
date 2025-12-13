@@ -8,8 +8,10 @@ import crud
 import query
 import settings
 
+
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
+
 
 @app.route("/")
 def index():
@@ -20,6 +22,7 @@ def index():
         top["credits"] = query.get_most_credits()
         top["shrooms"] = query.get_most_unique_eaten()
     return render_template("index.html", top=top)
+
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -57,6 +60,7 @@ def register():
 
     return render_template("register.html", filled={})
 
+
 @app.route("/view_report/<int:report_id>")
 def view_report(report_id):
     logged_in = require_login()
@@ -76,6 +80,7 @@ def view_report(report_id):
                            tastes=tastes, culvalues=culinaryvalues, categories=categories,
                            report_tastes=report_tastes, healthvalues=healthvalues,
                            symptom_counts=symptom_counts)
+
 
 @app.route("/view_user/<int:user_id>")
 def view_user(user_id):
@@ -98,6 +103,7 @@ def view_user(user_id):
     return render_template("view_user.html", user=user_data, reports=user_reports,
                             symptom_reports=user_symptom_reports)
 
+
 @app.route("/create_report/")
 def create_report(report_id=None):
     taste_ids = []
@@ -112,6 +118,7 @@ def create_report(report_id=None):
     colors, tastes, culinaryvalues, categories, _ = query.get_report_strings()
     return render_template("create_report.html", report=report, colors=colors, tastes=tastes,
                            culvalues=culinaryvalues, categories=categories, taste_ids=taste_ids)
+
 
 @app.route("/create_symptom_report/<int:report_id>")
 def create_symptom_report(report_id):
@@ -129,6 +136,7 @@ def create_symptom_report(report_id):
                         tastes=tastes, culvalues=culinaryvalues, categories=categories,
                         report_tastes=report_tastes, healthvalues=healthvalues,
                         symptom_counts=symptom_counts)
+
 
 @app.route("/send_symptom_report", methods=["POST"])
 def send_symptom_report():
@@ -153,6 +161,7 @@ def send_symptom_report():
     crud.update_user_credits(user_id, reward)
 
     return redirect(url_for("view_report", report_id=report_id))
+
 
 @app.route("/edit_report/<int:report_id>")
 def edit_report(report_id):
@@ -232,6 +241,7 @@ def send_report():
     crud.update_user_credits(uid, settings.REPORT_REWARD)
     return redirect(url_for("view_report", report_id=report_id))
 
+
 @app.route("/delete_report", methods=["POST"])
 def delete_report():
     logged_in = require_login()
@@ -248,10 +258,12 @@ def delete_report():
 
     return redirect(url_for("view_report", report_id=report_id))
 
+
 @app.route("/report_fatality/<int:user_id>")
 def report_fatality(user_id):
     print(f"unimplemented: fatality reported of user {user_id}")
     return "not yet implemented, please contact support"
+
 
 @app.route("/search", methods=["GET"])
 def search():
@@ -261,6 +273,7 @@ def search():
     keywords = request.args.get("query")
     result = query.get_search_results(keywords)
     return render_template("search.html", data=result)
+
 
 @app.route("/advsearch", methods=["GET", "POST"])
 def advanced_search():
@@ -300,6 +313,7 @@ def advanced_search():
     return render_template("search_advanced.html", filled=q, data=result, tastes=tastes,
                            taste_data=taste_data)
 
+
 @app.route("/login", methods=["POST"])
 def login():
     username = request.form["username"]
@@ -316,16 +330,19 @@ def login():
         return redirect(redir)
     return "Wrong username or password"
 
+
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
+
 
 def require_login():
     if "user_id" not in session:
         flash("Please log in or sign up")
         return False
     return True
+
 
 def require_report_ownership(report_id):
     owner_id = query.get_report_owner(report_id)
@@ -336,6 +353,7 @@ def require_report_ownership(report_id):
         print(f"Suspicious activity - require_ownership abort: {user_id} != {owner_id}")
         abort(403)
 
+
 def get_reportform_contents():
     tastecount    = query.get_availabe_tastes_count()
     category      = request.form.get("category")
@@ -345,12 +363,14 @@ def get_reportform_contents():
 
     return (category, color, culinaryvalue, tastes)
 
+
 def tastes_valid(tastes):
     valid_ids = query.get_valid_taste_ids()
     for taste_id in tastes:
         if taste_id not in valid_ids:
             return f"taste id {taste_id} invalid"
     return True
+
 
 def validate_username(username):
     allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
@@ -364,6 +384,7 @@ def validate_username(username):
             valid = False
             break
     return valid
+
 
 def validate_password(a, b):
     valid = True
@@ -380,6 +401,7 @@ def validate_password(a, b):
             valid = False
     return valid
 
+
 def validate_reportform_contents(category, color, culinaryvalue, tastes):
     if not category in [str(i) for i in range(1,16)]:
         abort(418)
@@ -395,9 +417,11 @@ def validate_reportform_contents(category, color, culinaryvalue, tastes):
         return (f"identical report already exists: Report {identical_report}", identical_report)
     return None
 
+
 def require_report_exists(report_id):
     if not query.report_exists(report_id):
         abort(404)
+
 
 def validate_symptomform_contents(healthvalue, blanched):
     if not healthvalue in [str(i) for i in range(1,6)]:
@@ -409,9 +433,11 @@ def validate_symptomform_contents(healthvalue, blanched):
         abort(418)
     return None
 
+
 def check_csrf():
     if request.form["csrf_token"] != session["csrf_token"]:
         abort(403)
+
 
 def other_user_posted_symptom_reports(report_id, session_user):
     # in case other users posted symptom reports: find first other user
