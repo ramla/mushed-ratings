@@ -43,7 +43,7 @@
           <details>
               <summary class="faq">Why am I here?</summary>
                   <div class="toggle-info">
-                    <p>Good day! You have been chosen to sample mushrooms on a newly found exoplanet. 
+                    <p>Congratulations! You have been chosen to sample mushrooms on a newly found exoplanet. 
                       Enjoy the local fungi in your cuisine and share your findings to gain credits* for your trouble.
                       1 000 000 credits earns you a trip back home and a gratis liver sample analysis. 
                   </div>
@@ -64,7 +64,7 @@
                   </div>
           </details>
       </div>
-    <p>Log in</p>
+    <h3>Log in</h3>
     <form action="/login" method="post">
       <p>
         Username: <br />
@@ -77,7 +77,7 @@
       <input type="hidden" name="redirect" value="/" />
       <input type="submit" value="Login" />
     </form>
-    <p>...or register <a href="{{ url_for('register') }}">here</a>!</p>
+    <h3>...or register <a href="{{ url_for('register') }}">here</a>!</h3>
     {% endif %}
   </div>
 {% endblock %}
