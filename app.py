@@ -6,14 +6,10 @@ import db
 import config
 import crud
 import query
+import settings
 
 app = Flask(__name__)
 app.secret_key = config.SECRET_KEY
-REPORT_REWARD       = 15
-SYMPTOM_REWARD      = 10
-SYMPTOM_REWARD_MIN  = 2
-SYMPTOM_REWARD_DIMINISHING_MULTIPLIER = 1
-TESTING = True
 
 @app.route("/")
 def index():
@@ -144,8 +140,8 @@ def send_symptom_report():
     if error:
         return error
     n_symptom_reports = query.get_n_symptom_reports_for(report_id)
-    reward = max(SYMPTOM_REWARD_MIN, SYMPTOM_REWARD
-                  - int((SYMPTOM_REWARD_DIMINISHING_MULTIPLIER * n_symptom_reports)))
+    reward = max(settings.SYMPTOM_REWARD_MIN, settings.SYMPTOM_REWARD
+                  - int((settings.SYMPTOM_REWARD_DIMINISHING_MULTIPLIER * n_symptom_reports)))
     crud.insert_symptom_report(user_id, report_id, healthvalue, blanched, reward)
 
     crud.update_user_credits(user_id, reward)
@@ -181,7 +177,7 @@ def send_report_edit(report_id):
     if identical_report:
         identical_report_id = identical_report[1][0]
         # Annul credits,
-        crud.update_user_credits(session_user, -REPORT_REWARD)
+        crud.update_user_credits(session_user, -settings.REPORT_REWARD)
         # in case of user reported symptoms:
         # update session_users symptom reports to point to found identical_report
         crud.move_symptom_reports(report_id, identical_report_id, session_user)
@@ -227,7 +223,7 @@ def send_report():
     crud.insert_report(uid, category, color, culinaryvalue)
     report_id = db.last_insert_id()
     crud.insert_tastes(report_id, tastes)
-    crud.update_user_credits(uid, REPORT_REWARD)
+    crud.update_user_credits(uid, settings.REPORT_REWARD)
     return redirect(url_for("view_report", report_id=report_id))
 
 @app.route("/delete_report", methods=["POST"])
@@ -241,7 +237,7 @@ def delete_report():
     require_report_ownership(owner_id)
     if not other_user_posted_symptom_reports(report_id, owner_id):
         crud.set_report_deleted(report_id)
-    crud.update_user_credits(owner_id, -REPORT_REWARD)
+    crud.update_user_credits(owner_id, -settings.REPORT_REWARD)
     crud.set_symptom_reports_deleted(report_id, owner_id)
 
     return redirect(url_for("view_report", report_id=report_id))
@@ -259,6 +255,27 @@ def search():
     keywords = request.args.get("query")
     result = query.get_search_results(keywords)
     return render_template("search.html", data=result)
+
+@app.route("/advsearch", methods=["GET", "POST"])
+def advanced_search():
+    logged_in = require_login()
+    if not logged_in:
+        return redirect("/")
+    check_csrf()
+    
+    if request.method == "POST":
+        q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
+        for param in settings.ADVANCED_SEARCH_PARAMETERS:
+            setattr(q, param, request.args.get(param))
+        error = q.validate()
+        if error:
+            flash(error)
+            return render_template("search_advanced.html", filled=q)
+
+        result = query.get_search_results_advanced(q)
+        return render_template("search.html", data=result)
+    return render_template("search_advanced.html", filled={})
+
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -330,7 +347,7 @@ def validate_password(a, b):
     if a != b:
         flash("Passwords do not match")
         valid = False
-    if TESTING:
+    if settings.TESTING:
         if len(a) == 0 or len(b) == 0:
             flash("Password may not be empty")
             valid = False
@@ -381,6 +398,6 @@ def other_user_posted_symptom_reports(report_id, session_user):
         # update report uid to first other user with symptom report
         crud.update_report_uid(report_id, first_other_user_id)
         # add report credits to that first other user
-        crud.update_user_credits(first_other_user_id, REPORT_REWARD)
+        crud.update_user_credits(first_other_user_id, settings.REPORT_REWARD)
         return True
     return False

@@ -1,20 +1,19 @@
 import db
+import settings
 
 class AdvancedSearchQuery:
-    def __init__(self):
-        user_name = None
-        date = None
-        category_name = None
-        color_name = None
-        culinaryvalue_name = None
-        taste_ids = None
-        edibility = None
-        deleted = None
-        sorting = "date"
-        descending = False
+    def __init__(self, params):
+        self.params = settings.ADVANCED_SEARCH_PARAMETERS
+        for param in params:
+            setattr(self,param,None)
+        self.sorting = "date"
+        self.descending = False
 
     def validate(self):
-        pass
+        if self.bad_input():
+            return "erorr message"
+        return False
+
 
 def get_auth(username):
     sql = """   SELECT auth, id
