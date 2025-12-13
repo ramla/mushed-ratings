@@ -21,10 +21,10 @@
       <input type="text" id="user_name" name="user_name" value="{{ (filled.user_name if filled else '')|e }}">
     </div>
 
-    <div>
+    <!-- <div>
       <label for="date">Date</label>
       <input type="date" id="date" name="date" value="{{ (filled.date if filled else '')|e }}">
-    </div>
+    </div> -->
 
     <div>
       <label for="category_name">Category</label>
@@ -110,6 +110,7 @@
         <th>Category</th>
         <th>Color</th>
         <th>Culinary value</th>
+        <th>Tastes</th>
         <th>Deleted</th>
       </tr>
     </thead>
@@ -122,6 +123,7 @@
         <td>{{ row.category_name }}</td>
         <td>{{ row.color_name }}</td>
         <td>{{ row.culinaryvalue_name }}</td>
+        <td>{{ row.taste_ids }}</td>
         <td>{{ row.deleted }}</td>
       </tr>
       {% else %}

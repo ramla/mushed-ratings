@@ -261,25 +261,27 @@ def advanced_search():
     logged_in = require_login()
     if not logged_in:
         return redirect("/")
-    check_csrf()
-
+    
+    result = {}
     empty_query = True
     q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
-    for param in settings.ADVANCED_SEARCH_PARAMETERS:
-        setattr(q, param, request.form.get(param))
-        if getattr(q, param):
-            empty_query = False
-    q.sorting = request.form.get("sorting")
-    desc_val = request.form.get("descending")
-    q.descending = desc_val in ("1", "true", "True")
-    error = q.validate()
-    if error:
-        flash(error)
-        return render_template("search_advanced.html", filled=q)
+    if request.method == "POST":
+        check_csrf()
 
-    result = {}
-    if not empty_query:
-        result = query.get_search_results_advanced(q)
+        for param in settings.ADVANCED_SEARCH_PARAMETERS:
+            setattr(q, param, request.form.get(param))
+            if getattr(q, param):
+                empty_query = False
+        q.sorting = request.form.get("sorting")
+        desc_val = request.form.get("descending")
+        q.descending = desc_val in ("1", "true", "True")
+        error = q.validate()
+        if error:
+            flash(error)
+            return render_template("search_advanced.html", filled=q)
+
+        if not empty_query:
+            result = query.get_search_results_advanced(q)
     return render_template("search_advanced.html", filled=q, data=result)
 
 @app.route("/login", methods=["POST"])

@@ -5,7 +5,7 @@ class AdvancedSearchQuery:
     def __init__(self, params):
         self.params = settings.ADVANCED_SEARCH_PARAMETERS
         for param in params:
-            setattr(self,param,None)
+            setattr(self,param,"")
         self.sorting = "date"
         self.descending = False
 
@@ -213,50 +213,63 @@ def get_search_results(keywords):
     return db.query(sql, [keywords, keywords, keywords, keywords, keywords])
 
 def get_search_results_advanced(query:AdvancedSearchQuery):
-    if not query.taste_ids:
-        query.taste_ids = []
+    taste_ids = []
+    if query.taste_ids:
+        taste_ids = query.taste_ids
     sql_begin = """ SELECT r.id, r.date, r.uid, r.deleted,
-                    u.name AS user_name,
-                    c.name AS color_name,
-                    cat.name AS category_name,
-                    cv.name AS culinaryvalue_name
+                        u.name AS user_name,
+                        c.name AS color_name,
+                        cat.name AS category_name,
+                        cv.name AS culinaryvalue_name,
+                        GROUP_CONCAT(t.id)    AS taste_ids,
+                        GROUP_CONCAT(t.name)  AS taste_names
                     FROM reports r
                         JOIN users u ON r.uid = u.id
                         JOIN colors c ON r.color = c.id
                         JOIN categories cat ON r.category = cat.id
-                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id"""
+                        JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
+                        JOIN report_tastes rt ON r.id = rt.report_id
+                        JOIN tastes t ON t.id = rt.tastes_id
+                        """
     sql_where = "WHERE 1=1"
     params = []
     if query.user_name:
-        sql_where += "  AND u.name = ?"
-        params += query.user_name
+        sql_where += "\n                        AND u.name LIKE ?"
+        params += [query.user_name]
+        print(params)
     if query.date:
         pass
     if query.category_name:
-        sql_where += "  AND cat.name = ?"
-        params += query.category_name
+        sql_where += "\n                        AND cat.name LIKE ?"
+        params +=  [query.category_name]
+        print(params)
     if query.color_name:
-        sql_where += "  AND c.name = ?"
-        params += query.color_name
+        sql_where += "\n                        AND c.name LIKE ?"
+        params += [query.color_name]
+        print(params)
     if query.culinaryvalue_name:
-        sql_where += "  AND cv.name = ?"
-        params += query.culinaryvalue_name
-    if query.taste_ids:
-        sql_begin += """    JOIN report_tastes rt ON r.id = rt.report_id
-                            JOIN tastes t ON t.id = rt.tastes_id"""
-        for t_id in query.taste_ids:
-            sql_where += "  AND t.id = ?"
-            params += t_id
+        sql_where += "\n                        AND cv.name LIKE ?"
+        params += [query.culinaryvalue_name]
+    if taste_ids:
+        # sql_begin += """    JOIN report_tastes rt ON r.id = rt.report_id
+        #                     JOIN tastes t ON t.id = rt.tastes_id
+        #                 """
+        for t_id in taste_ids:
+            sql_where += "\n                        AND t.id = ?"
+            params += [t_id]
     if query.edibility:
         sql_begin += """    LEFT JOIN symptomreports sr ON r.id = sr.report_id
-                            JOIN healthvalues hv ON sr.healthvalue = hv.id"""
-        sql_where += "  AND hv.name = ?"
-        params += query.edibility
+                            JOIN healthvalues hv ON sr.healthvalue = hv.id
+                        """
+        sql_where += "\n                        AND hv.name LIKE ?"
+        params += [query.edibility]
     if query.deleted == 0:
-        sql_where += "  AND deleted = 0"
+        sql_where += "\n                        AND deleted = 0"
     elif query.deleted == 1:
-        sql_where += "  AND deleted = 1"
+        sql_where += "\n                        AND deleted = 1"
 
+    sql_where += """\n                    GROUP BY r.id
+                """
     if query.sorting == "edibility":
         sql_begin = """ WITH HealthValueStats AS (
                         SELECT 
@@ -265,10 +278,13 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
                         FROM 
                             symptomreports
                         GROUP BY 
-                            report_id)"""+ sql_begin + """
+                            report_id)
+                    """ + sql_begin + """
                         LEFT JOIN HealthValueStats hvs ON hvs.report_id = r.id
                     """
-        sql = sql_begin + sql_where + "ORDER BY avg_healthvalue"
+        sql = sql_begin + sql_where + """
+        ORDER BY avg_healthvalue
+        """
     else:
         sql = sql_begin + sql_where
 
@@ -283,6 +299,7 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
     elif query.sorting == "culinary":
         sql += f"ORDER BY cv.name {query.descending*"DESC"}"
 
+    print("\n",sql, "\n\n", params, "\n")
     return db.query(sql, params)
 
 def get_uid_from_username(username):
