@@ -64,7 +64,6 @@
     <div>
       <label for="sorting">Sort by</label>
       <select id="sorting" name="sorting">
-        <option value="" {{ '' == (filled.sorting if filled else '') and 'selected' or '' }}>None</option>
         <option value="date" {{ 'date' == (filled.sorting if filled else '') and 'selected' or '' }}>Date</option>
         <option value="id" {{ 'id' == (filled.sorting if filled else '') and 'selected' or '' }}>ID</option>
         <option value="user" {{ 'user' == (filled.sorting if filled else '') and 'selected' or '' }}>User</option>
@@ -115,20 +114,25 @@
       </tr>
     </thead>
     <tbody>
-      {% for row in data %}
+      {% for i in range(data|length) %}
       <tr>
-        <td>{{ row.id }}</td>
-        <td>{{ row.date }}</td>
-        <td>{{ row.user_name }}</td>
-        <td>{{ row.category_name }}</td>
-        <td>{{ row.color_name }}</td>
-        <td>{{ row.culinaryvalue_name }}</td>
-        <td>{{ row.taste_ids }}</td>
-        <td>{{ row.deleted }}</td>
+        <td><a href="{{ url_for('view_report', report_id=data[i].id) }}">Report {{ data[i].id }}</a></td>
+        <td>{{ data[i].date }}</td>
+        <td>{{ data[i].user_name }}</td>
+        <td>{{ data[i].category_name }}</td>
+        <td>{{ data[i].color_name }}</td>
+        <td>{{ data[i].culinaryvalue_name }}</td>
+        <td>
+            {% for j in range(taste_data[i]|length) %}
+                {{ tastes[taste_data[i][j]] }}{% if j != taste_data[i]|length - 1 %}, 
+                {% endif %}
+            {% endfor %}
+        </td>
+        <td>{{ data[i].deleted }}</td>
       </tr>
       {% else %}
       <tr>
-        <td colspan="7">No results found.</td>
+        <td colspan="8">No results found.</td>
       </tr>
       {% endfor %}
     </tbody>

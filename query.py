@@ -47,7 +47,7 @@ def get_valid_taste_ids():
 
 def get_report_strings():
     colors         = db.query("SELECT id, name, hex FROM colors")
-    tastes         = db.query("SELECT id, name, description FROM tastes")
+    tastes         = get_tastes_strings()
     culinaryvalues = db.query("SELECT id, name, description FROM culinaryvalues")
     categories     = db.query("SELECT id, name FROM categories")
     healthvalues   = db.query("SELECT id, name, description FROM healthvalues")
@@ -56,6 +56,8 @@ def get_report_strings():
                     "description": description } 
             for id, name, description in healthvalues } )
 
+def get_tastes_strings():
+    return db.query("SELECT id, name, description FROM tastes")
 
 def get_report_owner(report_id):
     param = (report_id, )
@@ -221,8 +223,7 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
                         c.name AS color_name,
                         cat.name AS category_name,
                         cv.name AS culinaryvalue_name,
-                        GROUP_CONCAT(t.id)    AS taste_ids,
-                        GROUP_CONCAT(t.name)  AS taste_names
+                        GROUP_CONCAT(rt.tastes_id)    AS taste_ids
                     FROM reports r
                         JOIN users u ON r.uid = u.id
                         JOIN colors c ON r.color = c.id

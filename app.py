@@ -261,9 +261,11 @@ def advanced_search():
     logged_in = require_login()
     if not logged_in:
         return redirect("/")
-    
+
     result = {}
     empty_query = True
+    tastes = {}
+    taste_data = []
     q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
     if request.method == "POST":
         check_csrf()
@@ -281,8 +283,16 @@ def advanced_search():
             return render_template("search_advanced.html", filled=q)
 
         if not empty_query:
+            tastestrings = query.get_tastes_strings()
+            for i, row in enumerate(tastestrings):
+                tastes[str(i+1)] = row["name"]
             result = query.get_search_results_advanced(q)
-    return render_template("search_advanced.html", filled=q, data=result)
+            for row in result:
+                row_taste_ids = row["taste_ids"].split(",")
+                taste_data.append(row_taste_ids)
+
+    return render_template("search_advanced.html", filled=q, data=result, tastes=tastes,
+                           taste_data=taste_data)
 
 @app.route("/login", methods=["POST"])
 def login():
