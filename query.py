@@ -10,10 +10,7 @@ class AdvancedSearchQuery:
         self.descending = False
 
     def validate(self):
-        if self.bad_input():
-            return "erorr message"
         return False
-
 
 def get_auth(username):
     sql = """   SELECT auth, id
