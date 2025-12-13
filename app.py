@@ -285,7 +285,7 @@ def advanced_search():
     empty_query = True
     tastes = {}
     taste_data = []
-    q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
+    q = query.AdvancedSearchQuery()
     if request.method == "POST":
         check_csrf()
 
@@ -298,8 +298,7 @@ def advanced_search():
         q.descending = desc_val in ("1", "true", "True")
         error = q.validate()
         if error:
-            flash(error)
-            return render_template("search_advanced.html", filled=q)
+            return render_template("search_advanced.html", filled=q, data=result, tastes=tastes, taste_data=taste_data)
 
         if not empty_query:
             tastestrings = query.get_tastes_strings()
@@ -375,14 +374,14 @@ def tastes_valid(tastes):
 
 
 def validate_username(username):
-    allowed_username_characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+    settings.ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     valid = True
     if 3 > len(username) > 20:
         flash("Username must be between 3 and 20 characters")
         valid = False
     for char in username:
-        if not char in allowed_username_characters:
-            flash(f"Username may only contain {allowed_username_characters}")
+        if not char in settings.ALLOWED_CHARACTERS:
+            flash(f"Username may only contain {settings.ALLOWED_CHARACTERS}")
             valid = False
             break
     return valid

@@ -54,8 +54,7 @@
     <div>
       <label for="deleted">Deleted</label>
       <select id="deleted" name="deleted">
-        <option value="" {{ '' == (filled.deleted if filled else '') and 'selected' or '' }}>All</option>
-        <option value="0" {{ '0' == (filled.deleted if filled else '') and 'selected' or '' }}>Only active</option>
+        <option value="0" {{ '0' == (filled.deleted if filled else '') and 'selected' or '' }}>Don't include</option>
         <option value="1" {{ '1' == (filled.deleted if filled else '') and 'selected' or '' }}>Only deleted</option>
       </select>
     </div>

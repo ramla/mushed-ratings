@@ -1,16 +1,46 @@
+from flask import flash
 import db
 import settings
 
 class AdvancedSearchQuery:
-    def __init__(self, params):
+    def __init__(self):
         self.params = settings.ADVANCED_SEARCH_PARAMETERS
-        for param in params:
+        for param in self.params:
             setattr(self,param,"")
         self.sorting = "date"
         self.descending = False
 
     def validate(self):
-        return False
+        invalid = False
+        min_length = settings.VALID_SEARCH_QUERY_VALUES["min_length"]
+        max_length = settings.VALID_SEARCH_QUERY_VALUES["max_length"]
+        if self.sorting not in settings.VALID_SEARCH_QUERY_VALUES["sorting"]:
+            flash("Invalid value for sorting")
+            invalid = True
+        if self.descending not in [True, False]:
+            flash("What is happening here")
+            invalid = True
+        for param in self.params:
+            if param == "deleted":
+                if value not in ["", "0", "1"]:
+                    flash("What is happening here")
+                    invalid = True
+                continue
+            value = getattr(self, param)
+            if value is None or value == "":
+                continue
+            if len(value) < min_length:
+                flash(f"Too short keyword for {param}")
+                invalid = True
+            elif len(value) > max_length:
+                flash(f"Too long keyword for {param}")
+                invalid = True
+            else:
+                for char in value:
+                    if not char in settings.ALLOWED_CHARACTERS:
+                        flash(f"Keyword {param} may only contain {settings.ALLOWED_CHARACTERS}")
+                        invalid = True
+        return invalid
 
 
 def get_auth(username):
@@ -272,25 +302,20 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
     params = []
     if query.user_name:
         sql_where += "\n                        AND u.name LIKE ?"
-        params += [query.user_name]
+        params += ["%" + query.user_name + "%"]
         print(params)
-    if query.date:
-        pass
     if query.category_name:
         sql_where += "\n                        AND cat.name LIKE ?"
-        params +=  [query.category_name]
+        params +=  ["%" + query.category_name + "%"]
         print(params)
     if query.color_name:
         sql_where += "\n                        AND c.name LIKE ?"
-        params += [query.color_name]
+        params += ["%" + query.color_name + "%"]
         print(params)
     if query.culinaryvalue_name:
         sql_where += "\n                        AND cv.name LIKE ?"
-        params += [query.culinaryvalue_name]
+        params += ["%" + query.culinaryvalue_name + "%"]
     if taste_ids:
-        # sql_begin += """    JOIN report_tastes rt ON r.id = rt.report_id
-        #                     JOIN tastes t ON t.id = rt.tastes_id
-        #                 """
         for t_id in taste_ids:
             sql_where += "\n                        AND t.id = ?"
             params += [t_id]
@@ -299,7 +324,7 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
                             JOIN healthvalues hv ON sr.healthvalue = hv.id
                         """
         sql_where += "\n                        AND hv.name LIKE ?"
-        params += [query.edibility]
+        params += ["%" + query.edibility + "%"]
     if query.deleted == 0:
         sql_where += "\n                        AND deleted = 0"
     elif query.deleted == 1:
