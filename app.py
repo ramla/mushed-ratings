@@ -262,7 +262,7 @@ def advanced_search():
     if not logged_in:
         return redirect("/")
     check_csrf()
-    
+
     if request.method == "POST":
         q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
         for param in settings.ADVANCED_SEARCH_PARAMETERS:
