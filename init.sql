@@ -13,10 +13,10 @@ INSERT INTO culinaryvalues (name, description) VALUES ('Delicacy', 'Potentially 
 INSERT INTO culinaryvalues (name, description) VALUES ('Palatable', 'An acquired taste, perhaps');
 INSERT INTO culinaryvalues (name, description) VALUES ('Inpalatable', 'Unilaterally foul, does not belong in a kitchen');
 
+INSERT INTO healthvalues (name, description) VALUES ('Edible', 'Can be part of a healthy diet');
 INSERT INTO healthvalues (name, description) VALUES ('Indigestible', 'Stomach aches, but no long term effects');
 INSERT INTO healthvalues (name, description) VALUES ('Poisonous', 'Causes bodily harm but is not immediately fatal');
 INSERT INTO healthvalues (name, description) VALUES ('Deadly', 'Potentially fatal in meal sized doses');
-INSERT INTO healthvalues (name, description) VALUES ('Edible', 'Can be part of a healthy diet');
 INSERT INTO healthvalues (name, description) VALUES ('Unknown', 'No effects to health reported yet');
 
 INSERT INTO categories (name) VALUES ('Russula');
