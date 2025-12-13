@@ -256,20 +256,21 @@ def search():
     result = query.get_search_results(keywords)
     return render_template("search.html", data=result)
 
-@app.route("/advsearch", methods=["GET"])
+@app.route("/advsearch", methods=["GET", "POST"])
 def advanced_search():
     logged_in = require_login()
     if not logged_in:
         return redirect("/")
+    check_csrf()
 
     empty_query = True
     q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
     for param in settings.ADVANCED_SEARCH_PARAMETERS:
-        setattr(q, param, request.args.get(param))
+        setattr(q, param, request.form.get(param))
         if getattr(q, param):
             empty_query = False
-    q.sorting = request.args.get("sorting")
-    desc_val = request.args.get("descending")
+    q.sorting = request.form.get("sorting")
+    desc_val = request.form.get("descending")
     q.descending = desc_val in ("1", "true", "True")
     error = q.validate()
     if error:
