@@ -11,6 +11,7 @@
 body {
     background-color: #181818;
     color: var(--color-text);
+    font-family: Ubuntu, Candara, sans-serif;
 }
 
 a:link {
