@@ -38,6 +38,31 @@ def get_earliest_symptom_report(report_id, not_from=None):
             """
     return db.query(sql + end, params)
 
+def get_most_credits():
+    sql = """   SELECT id, name, credits AS amount
+                FROM users
+                ORDER BY credits DESC
+        """
+    return db.query(sql, [])[0]
+
+def get_most_unique_eaten():
+    sql = """   SELECT  u.id,
+                        u.name,
+                        COUNT(DISTINCT r.report_id) AS amount
+                FROM users u
+                LEFT JOIN
+                    (   SELECT id AS report_id, uid
+                            FROM reports
+                        UNION
+                        SELECT report_id, uid
+                            FROM symptomreports
+                    ) AS r 
+                    ON r.uid = u.id
+                GROUP BY u.id
+                ORDER BY amount DESC
+        """
+    return db.query(sql, [])[0]
+
 def get_valid_taste_ids():
     result = db.query("SELECT id FROM tastes")
     id_list = []

@@ -11,6 +11,15 @@
       Logged in as <a href="{{ url_for('view_user', user_id=session.user_id) }}">{{ session.username }}</a>.
   <br><span style="font-size: 80%">Not {{session.username}}? <a href="/logout">Logout</a> or <a href="{{ url_for('report_fatality', user_id=session.user_id) }}">report the departed</a>.</span>
     </p>
+    
+    <p> {% if top.credits.amount > 0 %}
+      Value top dog: <br><span class="indented"><a href="{{ url_for('view_user', user_id=top.credits.id) }}">{{ top.credits.name }}</a>: {{ top.credits.amount }} credits collected</span><br>
+        {% endif %}
+        {% if top.shrooms.amount > 1 %}
+      Veteran of variety: <br><span class="indented"><a href="{{ url_for('view_user', user_id=top.shrooms.id) }}">{{ top.shrooms.name }}</a>: {{ top.shrooms.amount }} different mushrooms eaten<br></span>
+        {% endif %}
+    </p>
+    
     <p>We're working really hard to implement the following features for your benefit
       <ul>
         <li>Credit annullment (partially done)</li>

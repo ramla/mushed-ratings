@@ -13,7 +13,13 @@ app.secret_key = config.SECRET_KEY
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    top = { "shrooms": { "amount": 0},
+            "credits": { "amount": 0}
+        }
+    if "username" in session:
+        top["credits"] = query.get_most_credits()
+        top["shrooms"] = query.get_most_unique_eaten()
+    return render_template("index.html", top=top)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
