@@ -256,26 +256,30 @@ def search():
     result = query.get_search_results(keywords)
     return render_template("search.html", data=result)
 
-@app.route("/advsearch", methods=["GET", "POST"])
+@app.route("/advsearch", methods=["GET"])
 def advanced_search():
     logged_in = require_login()
     if not logged_in:
         return redirect("/")
-    check_csrf()
 
-    if request.method == "POST":
-        q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
-        for param in settings.ADVANCED_SEARCH_PARAMETERS:
-            setattr(q, param, request.args.get(param))
-        error = q.validate()
-        if error:
-            flash(error)
-            return render_template("search_advanced.html", filled=q)
+    empty_query = True
+    q = query.AdvancedSearchQuery(settings.ADVANCED_SEARCH_PARAMETERS)
+    for param in settings.ADVANCED_SEARCH_PARAMETERS:
+        setattr(q, param, request.args.get(param))
+        if getattr(q, param):
+            empty_query = False
+    q.sorting = request.args.get("sorting")
+    desc_val = request.args.get("descending")
+    q.descending = desc_val in ("1", "true", "True")
+    error = q.validate()
+    if error:
+        flash(error)
+        return render_template("search_advanced.html", filled=q)
 
+    result = {}
+    if not empty_query:
         result = query.get_search_results_advanced(q)
-        return render_template("search.html", data=result)
-    return render_template("search_advanced.html", filled={})
-
+    return render_template("search_advanced.html", filled=q, data=result)
 
 @app.route("/login", methods=["POST"])
 def login():

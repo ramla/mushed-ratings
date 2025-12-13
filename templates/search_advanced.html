@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced search{% endblock %}
+
+{% block stylesheets %}
+<link rel="stylesheet" href="{{ url_for('static', filename='search.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='search_advanced.css') }}">
+{% endblock %}
+
+{% block content %}
+{% if session.user_id %}
+
+<h2>Advanced search</h2>
+
+<form class="adv-search-form" action="{{ url_for('advanced_search') }}" method="post">
+  <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+
+  <div class="row">
+    <div>
+      <label for="user_name">User name</label>
+      <input type="text" id="user_name" name="user_name" value="{{ (filled.user_name if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="date">Date</label>
+      <input type="date" id="date" name="date" value="{{ (filled.date if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="category_name">Category</label>
+      <input type="text" id="category_name" name="category_name" value="{{ (filled.category_name if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="color_name">Color</label>
+      <input type="text" id="color_name" name="color_name" value="{{ (filled.color_name if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="culinaryvalue_name">Culinary value</label>
+      <input type="text" id="culinaryvalue_name" name="culinaryvalue_name" value="{{ (filled.culinaryvalue_name if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="taste_ids">Taste IDs (comma-separated)</label>
+      <input type="text" id="taste_ids" name="taste_ids" placeholder="e.g. 1,2,3" value="{{ (filled.taste_ids if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="edibility">Edibility</label>
+      <input type="text" id="edibility" name="edibility" value="{{ (filled.edibility if filled else '')|e }}">
+    </div>
+
+    <div>
+      <label for="deleted">Deleted</label>
+      <select id="deleted" name="deleted">
+        <option value="" {{ '' == (filled.deleted if filled else '') and 'selected' or '' }}>All</option>
+        <option value="0" {{ '0' == (filled.deleted if filled else '') and 'selected' or '' }}>Only active</option>
+        <option value="1" {{ '1' == (filled.deleted if filled else '') and 'selected' or '' }}>Only deleted</option>
+      </select>
+    </div>
+
+    {# Optional sorting fields if supported #}
+    <div>
+      <label for="sorting">Sort by</label>
+      <select id="sorting" name="sorting">
+        <option value="" {{ '' == (filled.sorting if filled else '') and 'selected' or '' }}>None</option>
+        <option value="date" {{ 'date' == (filled.sorting if filled else '') and 'selected' or '' }}>Date</option>
+        <option value="id" {{ 'id' == (filled.sorting if filled else '') and 'selected' or '' }}>ID</option>
+        <option value="user" {{ 'user' == (filled.sorting if filled else '') and 'selected' or '' }}>User</option>
+        <option value="category" {{ 'category' == (filled.sorting if filled else '') and 'selected' or '' }}>Category</option>
+        <option value="culinary" {{ 'culinary' == (filled.sorting if filled else '') and 'selected' or '' }}>Culinary</option>
+        <option value="edibility" {{ 'edibility' == (filled.sorting if filled else '') and 'selected' or '' }}>Edibility</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="descending">Descending</label>
+      <select id="descending" name="descending">
+        <option value="0" {{ (filled.descending if filled else '0') in ['0', 0, False, 'False'] and 'selected' or '' }}>No</option>
+        <option value="1" {{ (filled.descending if filled else '0') in ['1', 1, True, 'True'] and 'selected' or '' }}>Yes</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button type="submit">Search</button>
+    <button type="reset" class="secondary">Reset</button>
+  </div>
+</form>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="notice">
+      {% for message in messages %}
+        <div>{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+{% if data %}
+  <h3>Results</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Date</th>
+        <th>User</th>
+        <th>Category</th>
+        <th>Color</th>
+        <th>Culinary value</th>
+        <th>Deleted</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in data %}
+      <tr>
+        <td>{{ row.id }}</td>
+        <td>{{ row.date }}</td>
+        <td>{{ row.user_name }}</td>
+        <td>{{ row.category_name }}</td>
+        <td>{{ row.color_name }}</td>
+        <td>{{ row.culinaryvalue_name }}</td>
+        <td>{{ row.deleted }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7">No results found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+
+{% else %}
+  <p>You must be logged in to use advanced search.</p>
+{% endif %}
+{% endblock %}

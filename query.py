@@ -1,5 +1,5 @@
-import db
 import settings
+import db
 
 class AdvancedSearchQuery:
     def __init__(self, params):
@@ -11,6 +11,7 @@ class AdvancedSearchQuery:
 
     def validate(self):
         return False
+
 
 def get_auth(username):
     sql = """   SELECT auth, id
@@ -212,8 +213,8 @@ def get_search_results(keywords):
     return db.query(sql, [keywords, keywords, keywords, keywords, keywords])
 
 def get_search_results_advanced(query:AdvancedSearchQuery):
-    if not taste_ids:
-        taste_ids = []
+    if not query.taste_ids:
+        query.taste_ids = []
     sql_begin = """ SELECT r.id, r.date, r.uid, r.deleted,
                     u.name AS user_name,
                     c.name AS color_name,
@@ -240,10 +241,10 @@ def get_search_results_advanced(query:AdvancedSearchQuery):
     if query.culinaryvalue_name:
         sql_where += "  AND cv.name = ?"
         params += query.culinaryvalue_name
-    if taste_ids:
+    if query.taste_ids:
         sql_begin += """    JOIN report_tastes rt ON r.id = rt.report_id
                             JOIN tastes t ON t.id = rt.tastes_id"""
-        for t_id in taste_ids:
+        for t_id in query.taste_ids:
             sql_where += "  AND t.id = ?"
             params += t_id
     if query.edibility:
