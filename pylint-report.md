@@ -16,3 +16,9 @@ My .pylintrc already has C0114, C0115, C0116 disabled as I deemed module, class 
 R0903 'too few public methods' is interesting, maybe I could just as well pass the search query data around as just a dictionary if I am not going to implement more methods, but the advanced search feature is pretty much incomplete as is and more methods could follow.
 
 For the R0912 'too many branches' in the advanced search sql query assembly function probably the branching and especially concats could be reduced but for now it shall be left as is.
+
+There is also a message that appears live but not in the generated report on app.py:9:0:
+```
+third party import "settings" should be placed before first party imports "db", "config", "crud", "query" Pylint(C0411:wrong-import-order)
+```
+This might be due to me naming the file with constants as settings.py, a name which could be used by another module.
