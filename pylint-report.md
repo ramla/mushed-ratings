@@ -1,13 +1,13 @@
-#Pylint report
+# Pylint report
 
-´´´
+```
 ************* Module query
 query.py:5:0: R0903: Too few public methods (1/2) (too-few-public-methods)
 query.py:286:0: R0912: Too many branches (17/12) (too-many-branches)
 
 ------------------------------------------------------------------
 Your code has been rated at 9.97/10 (previous run: 9.95/10, +0.02)
-´´´
+```
 
 I enabled pylint in VSCode early on during this project due to interest and while my initial reaction to some of the messages was mild irritation each of the recommended practices did make sense and I embraced running pylint live in the IDE.
 
