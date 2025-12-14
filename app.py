@@ -382,7 +382,7 @@ def tastes_valid(tastes):
 def validate_username(username):
     settings.ALLOWED_CHARACTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
     valid = True
-    if 3 > len(username) > 20:
+    if len(username) < 3 or len(username) > 20:
         flash("Username must be between 3 and 20 characters")
         valid = False
     for char in username:
