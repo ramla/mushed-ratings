@@ -28,12 +28,12 @@ def index():
 def register():
     if request.method == "POST":
         valid = True
-        username  = request.form["username"]
+        username  = request.form.get("username")
         if not validate_username(username):
             valid = False
 
-        password  = request.form["password1"]
-        password2 = request.form["password2"]
+        password  = request.form.get("password1")
+        password2 = request.form.get("password2")
         if not validate_password(password, password2):
             valid = False
 
@@ -321,9 +321,9 @@ def advanced_search():
 
 @app.route("/login", methods=["POST"])
 def login():
-    username = request.form["username"]
-    password = request.form["password"]
-    redir    = request.form["redirect"]
+    username = request.form.get("username")
+    password = request.form.get("password")
+    redir    = request.form.get("redirect")
 
     result = query.get_auth(username)
     if result:
@@ -442,7 +442,7 @@ def validate_symptomform_contents(healthvalue, blanched):
 
 
 def check_csrf():
-    if request.form["csrf_token"] != session["csrf_token"]:
+    if request.form.get("csrf_token") != session["csrf_token"]:
         abort(403)
 
 
