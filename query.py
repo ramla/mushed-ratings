@@ -149,7 +149,10 @@ def get_report_details(report_id):
                         JOIN categories cat ON r.category = cat.id
                         JOIN culinaryvalues cv ON r.culinaryvalue = cv.id
                     WHERE r.id = ?"""
-    return db.query(report_sql, param)[0]
+    result = db.query(report_sql, param)
+    if len(result) == 0:
+        return None
+    return result[0]
 
 
 def get_report_healthvalues(report_id):

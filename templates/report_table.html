@@ -1,4 +1,8 @@
-{% if fetched.deleted %}
+{% if fetched == None %}
+    {% for message in get_flashed_messages() %}
+    <p class="flash">{{ message }}</p>
+    {% endfor %}
+{% elif fetched.deleted %}
 <h2>Report deleted by user</h2>
 {% else %}
 <h2>Sampling report</h2>

@@ -67,14 +67,19 @@ def view_report(report_id):
     if not logged_in:
         return redirect("/")
 
-    colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
-    report_tastes = query.get_report_taste_strings(report_id)
-    fetched       = query.get_report_details(report_id)
-    symptom_counts  = list(query.get_report_healthvalues(report_id))
+    colors, tastes, culinaryvalues, categories = None, None, None, None
+    healthvalues, report_tastes, symptom_counts, fetched = None, None, None, None
 
-    taste_ids = [taste[0] for taste in report_tastes]
-    query.report_exists_with(fetched["category"],fetched["color"],
-                             fetched["culinaryvalue_id"],taste_ids)
+    if 10e9 < report_id < 1:
+        flash("Invalid report id")
+    else:
+        fetched       = query.get_report_details(report_id)
+        if not fetched:
+            flash(f"No report found with id {report_id}")
+        else:
+            colors, tastes, culinaryvalues, categories, healthvalues = query.get_report_strings()
+            report_tastes = query.get_report_taste_strings(report_id)
+            symptom_counts  = list(query.get_report_healthvalues(report_id))
 
     return render_template("view_report.html", fetched=fetched, colors=colors,
                            tastes=tastes, culvalues=culinaryvalues, categories=categories,
@@ -298,7 +303,8 @@ def advanced_search():
         q.descending = desc_val in ("1", "true", "True")
         error = q.validate()
         if error:
-            return render_template("search_advanced.html", filled=q, data=result, tastes=tastes, taste_data=taste_data)
+            return render_template("search_advanced.html", filled=q, data=result, tastes=tastes,
+                                   taste_data=taste_data)
 
         if not empty_query:
             tastestrings = query.get_tastes_strings()
